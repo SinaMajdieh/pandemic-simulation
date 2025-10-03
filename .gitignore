@@ -1,0 +1,15 @@
+.import/
+.export/
+*.tmp
+*.log
+*.bin
+*.exe
+*.dll
+*.pdb
+*.cache
+*.import
+*.mono/
+*.godot/
+*.uid
+.editorconfig
+.vscode/
