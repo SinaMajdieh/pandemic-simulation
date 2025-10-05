@@ -1,48 +1,55 @@
-## Class: SimulationController
-## Why: Coordinates agent simulation and rendering, acting as the main loop entry point.
-##      Keeps logic modular by delegating physics to AgentManager and rendering to AgentRenderer.
+## Main simulation coordinator.
+## Why: Separates simulation logic (AgentManager) from rendering (AgentRenderer) to
+##      allow independent performance tuning and future GPU integration without breaking visual code.
 extends Node2D
 
-
 @export_category("Simulation Properties")
-## Total number of agents in the simulation; high count tests scalability.
-@export var population: int = 10_000
+# Simualtion configuration
+@export var simulation_config: SimulationConfig = SimulationConfig.new()
+# Simulation bound scale relative to viewport size
+@export_range(0.0, 1.0) var bounds_scale: float = 1.0
 
-## Uniform movement speed for all agents; chosen to maintain visual coherence.
-@export var agent_speed: float = 50.0
+## Why: Dedicated bounds node simplifies layout control and enforces movement constraints visually and logically.
+@export var simulation_bounds: Node2D
+@export var cell_grid: GraphGrid
 
 
 @export_category("Rendering Properties")
-## Radius of each agent’s circle mesh; small for high-density visuals.
-@export var radius: float = 2.0
+@export var radius: float = 2.0 
+## Why: Small radius prevents visual overlap at high density while still making agents distinguishable.
 
-## Segments for circle mesh geometry; higher = smoother but heavier.
 @export var segments: int = 16
-
-## Default agent display color; can later be replaced with state-specific (SEIR) colors.
-@export var agent_color: Color = Color("61AFEF")
+## Why: Balanced segment count keeps circles moderately smooth without overtaxing mesh generation or GPU batching.
 
 
-## Manages agent position, direction, and boundary logic.
+## Simulation state/movement handler.
 var agent_manager: AgentManager
-
-## Handles efficient rendering of all agents via MultiMesh.
+## MultiMesh-based renderer for agents.
 var agent_renderer: AgentRenderer
 
 
-## Initializes simulation objects.
-## Why: Separates simulation state setup from rendering setup; ensures deterministic start state.
+## Initializes simulation and rendering systems.
+## Why: Creates isolated subsystems so each can be optimized or replaced independently
+##      (e.g., GPU compute for logic, shader-based rendering for visuals).
 func _ready() -> void:
-	randomize()  # Seed RNG to guarantee unique initial positions per run.
-	var bounds: Vector2 = get_viewport_rect().size  # Prevent agents from moving outside visible area.
-	agent_manager = AgentManager.new(population, agent_speed, bounds)
+	randomize()  # Ensures agents start with varied positions/directions for realism.
+	var screen_bounds: Vector2 = get_viewport_rect().size
+	simulation_config.bounds = screen_bounds * bounds_scale
+	simulation_bounds.size = simulation_config.bounds
+	cell_grid.custom_minimum_size = simulation_config.bounds
+	cell_grid.set_spacing(simulation_config.infection_config.transmission_radius, simulation_config.infection_config.transmission_radius) 
+	simulation_bounds.center_relative_to(screen_bounds)
+	
+	agent_manager = AgentManager.new(simulation_config)
+	agent_renderer = AgentRenderer.new(radius, segments, simulation_config.agent_count)
+	simulation_bounds.add_child(agent_renderer)
+	
+	## Why: Kickstarts outbreak dynamics without manual infection events.
+	agent_manager.state_manager.seed_stage((1 / float(simulation_config.agent_count)), AgentStateManager.AgentState.EXPOSED) # make only 1 agent exposed
 
-	agent_renderer = AgentRenderer.new(radius, segments, population, agent_color)
-	add_child(agent_renderer)
 
-
-## Main simulation loop; advances simulation state and updates rendering each frame.
-## Why: Keeps physics and graphics in sync without storing duplicate position data.
+## Runs one simulation tick and refreshes visuals.
+## Why: Syncs physics calculations and rendering updates to prevent frame drift or visual desynchronization.
 func _process(delta: float) -> void:
-	agent_manager.advance(delta)  # Move agents + apply boundary rules.
-	agent_renderer.update_from_manager(agent_manager)  # Render updated positions & colors.
+	agent_manager.advance(delta)                      
+	agent_renderer.update_from_manager(agent_manager)

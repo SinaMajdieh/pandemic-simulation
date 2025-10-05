@@ -1,8 +1,54 @@
-[gd_scene load_steps=2 format=3 uid="uid://pumx6vjvgno2"]
+[gd_scene load_steps=9 format=3 uid="uid://pumx6vjvgno2"]
 
 [ext_resource type="Script" uid="uid://dny5q5r73lfbp" path="res://scripts/simulation_controller.gd" id="1_y5vwh"]
+[ext_resource type="Script" uid="uid://cfgo80ofitf1q" path="res://scripts/simulation_bounds.gd" id="2_5eski"]
+[ext_resource type="Script" uid="uid://c0mr3ntsvgl0c" path="res://scripts/resources/simulation_config.gd" id="2_ik8a0"]
+[ext_resource type="Script" uid="uid://dvge2gba0gq2h" path="res://scripts/resources/infection_config.gd" id="2_ljsjv"]
+[ext_resource type="Script" uid="uid://r3cevw28pd68" path="res://scripts/camera.gd" id="4_gimvv"]
+[ext_resource type="Script" uid="uid://osmewmqr43qt" path="res://scripts/plot/grid.gd" id="5_mwrr7"]
 
-[node name="Simulation" type="Node2D"]
+[sub_resource type="Resource" id="Resource_mwrr7"]
+script = ExtResource("2_ljsjv")
+transmission_radius = 32.0
+transmission_probability = 0.001
+max_per_cell = 64
+metadata/_custom_type_script = "uid://dvge2gba0gq2h"
+
+[sub_resource type="Resource" id="Resource_gimvv"]
+script = ExtResource("2_ik8a0")
+agent_speed = 5.0
+bounds = Vector2(700, 500)
+infection_config = SubResource("Resource_mwrr7")
+stage_durations = Dictionary[int, Vector2]({
+0: Vector2(0, 0),
+1: Vector2(8, 10),
+2: Vector2(2, 4),
+3: Vector2(0, 0)
+})
+metadata/_custom_type_script = "uid://c0mr3ntsvgl0c"
+
+[node name="Simulation" type="Node2D" node_paths=PackedStringArray("simulation_bounds", "cell_grid")]
 script = ExtResource("1_y5vwh")
-radius = 1.0
-segments = 4
+simulation_config = SubResource("Resource_gimvv")
+simulation_bounds = NodePath("SimulationBounds")
+cell_grid = NodePath("SimulationBounds/Grid")
+radius = 1.3
+segments = 32
+
+[node name="Camera2D" type="Camera2D" parent="."]
+limit_enabled = false
+limit_left = 0
+limit_top = 0
+script = ExtResource("4_gimvv")
+min_zoom = 1.0
+max_zoom = 30.0
+transition_type = 1
+ease_type = 2
+
+[node name="SimulationBounds" type="Node2D" parent="."]
+script = ExtResource("2_5eski")
+
+[node name="Grid" type="Control" parent="SimulationBounds"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("5_mwrr7")
