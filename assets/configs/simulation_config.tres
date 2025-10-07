@@ -6,7 +6,7 @@
 [sub_resource type="Resource" id="Resource_mwrr7"]
 script = ExtResource("1_10nyi")
 transmission_radius = 7.0
-transmission_probability = 0.001
+transmission_probability = 0.1
 max_per_cell = 64
 metadata/_custom_type_script = "uid://dvge2gba0gq2h"
 
