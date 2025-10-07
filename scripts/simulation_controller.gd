@@ -58,7 +58,7 @@ func _ready() -> void:
 
 	## Auto-seed one exposed agent — avoids a “dead” simulation that needs manual triggering.
 	agent_manager.state_manager.seed_stage(
-		1.0 / float(simulation_config.agent_count),
+		10.0 / float(simulation_config.agent_count),
 		AgentStateManager.AgentState.EXPOSED
 	)
 

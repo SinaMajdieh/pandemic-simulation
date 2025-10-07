@@ -1,0 +1,54 @@
+[gd_scene load_steps=5 format=3 uid="uid://t464y2iiwk26"]
+
+[ext_resource type="Script" uid="uid://vy35mtcpal37" path="res://scripts/plot/metric_graph_panel.gd" id="1_8ksmu"]
+[ext_resource type="Script" uid="uid://xdn0h2w7emy5" path="res://scripts/plot/metric_graph.gd" id="2_gfiw3"]
+[ext_resource type="Script" uid="uid://osmewmqr43qt" path="res://scripts/plot/grid.gd" id="2_mmao1"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nyj0f"]
+content_margin_left = 1.0
+content_margin_bottom = 1.0
+bg_color = Color(0.6, 0.6, 0.6, 0)
+border_width_left = 1
+border_width_bottom = 1
+border_color = Color(0.67058825, 0.69803923, 0.7490196, 1)
+
+[node name="MetricGraphPanel" type="MarginContainer" node_paths=PackedStringArray("graph_node", "title_label")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 0
+script = ExtResource("1_8ksmu")
+graph_node = NodePath("VBoxContainer/GraphContainer/Graph")
+title_label = NodePath("VBoxContainer/Title")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 1
+theme_type_variation = &"HeaderLarge"
+theme_override_font_sizes/font_size = 20
+text = "TITLE"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GraphContainer" type="PanelContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_nyj0f")
+
+[node name="Grid" type="Control" parent="VBoxContainer/GraphContainer"]
+layout_mode = 2
+script = ExtResource("2_mmao1")
+spacing_x = 16.0
+spacing_y = 16.0
+
+[node name="Graph" type="Control" parent="VBoxContainer/GraphContainer"]
+layout_mode = 2
+script = ExtResource("2_gfiw3")
