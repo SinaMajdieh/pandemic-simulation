@@ -27,7 +27,9 @@ var target_zoom: float:
 	set(value):
 		target_zoom = value
 		_update_limits()
+		zoom_changed.emit(target_zoom)
 ## Stores where we want to end up zoom-wise; setter recalculates bounds immediately.
+signal zoom_changed(zoom: float)
 
 var target_position: Vector2
 ## The “target” position the node will animate toward during panning or zoom anchoring.
@@ -67,6 +69,8 @@ func _ready() -> void:
 func _input(event: InputEvent) -> void:
 	if not target_node:
 		return
+	if not is_mouse_inside_bounds(event):
+		return
 	if event is InputEventMouseButton and event.is_pressed():
 		match event.button_index:
 			MOUSE_BUTTON_WHEEL_UP:
@@ -75,6 +79,21 @@ func _input(event: InputEvent) -> void:
 				_zoom(1.0 / zoom_scale)
 	elif event is InputEventMouseMotion and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 		_pan(event.relative)
+
+## Purpose: Checks whether a mouse event occurred within the defined `bounds`
+## of this node's local space — used to gate input handling so clicks/pans
+## only affect the simulation area.
+func is_mouse_inside_bounds(event: InputEvent) -> bool:
+	if event is InputEventMouse:
+		var local_mouse_position: Vector2 = to_local(event.position)
+		# Create rectangle representing the playable/viewable area in local space.
+		# Origin at (0,0) with size `bounds` so has_point() check is straightforward.
+		var area_rect: Rect2 = Rect2(Vector2.ZERO, bounds)
+		if area_rect.has_point(local_mouse_position):
+			return true
+		else:
+			return false
+	return false
 
 func _pan(relative: Vector2) -> void:
 	## Dividing by target_zoom keeps panning speed constant in screen space

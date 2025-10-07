@@ -1,6 +1,10 @@
-[gd_scene load_steps=2 format=3 uid="uid://dva3p76bui31w"]
+[gd_scene load_steps=6 format=3 uid="uid://dva3p76bui31w"]
 
-[ext_resource type="PackedScene" uid="uid://pumx6vjvgno2" path="res://scenes/simulation.tscn" id="1_errlg"]
+[ext_resource type="PackedScene" uid="uid://pumx6vjvgno2" path="res://scenes/simulation.tscn" id="1_axkpk"]
+[ext_resource type="Theme" uid="uid://cd86gbw8ppkb" path="res://assets/themes/one_dark.tres" id="1_wo8b0"]
+[ext_resource type="Script" uid="uid://bi45lkxsa6ojy" path="res://scripts/zoom_pan.gd" id="3_iaqyx"]
+[ext_resource type="Script" uid="uid://d2yj3o0hs2ar2" path="res://scripts/simulation_ui/zoom_label.gd" id="4_0qlcw"]
+[ext_resource type="Script" uid="uid://bmmxhednxx6g" path="res://scripts/simulation_ui/state_label.gd" id="5_nxfk8"]
 
 [node name="Control" type="GridContainer"]
 anchors_preset = 15
@@ -8,27 +12,124 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("1_wo8b0")
 columns = 2
 
-[node name="Control" type="Control" parent="."]
-texture_filter = 1
+[node name="SimulationContainer" type="Control" parent="."]
 clip_contents = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Simulation" parent="Control" node_paths=PackedStringArray("ui_container") instance=ExtResource("1_errlg")]
+[node name="Simulation" parent="SimulationContainer" node_paths=PackedStringArray("ui_container", "zoom_pan") instance=ExtResource("1_axkpk")]
 ui_container = NodePath("..")
+zoom_pan = NodePath("ZoomPan")
+radius = 0.8
 
-[node name="Control2" type="Control" parent="."]
+[node name="ZoomPan" type="Node2D" parent="SimulationContainer/Simulation" node_paths=PackedStringArray("target_node")]
+script = ExtResource("3_iaqyx")
+target_node = NodePath("..")
+min_zoom = 1.0
+max_zoom = 100.0
+limits_enabled = true
+
+[node name="ZoomLabel" type="Label" parent="SimulationContainer" node_paths=PackedStringArray("zoom_pan")]
+layout_mode = 1
+offset_right = 77.0
+offset_bottom = 23.0
+theme = ExtResource("1_wo8b0")
+theme_type_variation = &"text_primary"
+theme_override_font_sizes/font_size = 24
+text = "Zoom: 1.0"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("4_0qlcw")
+zoom_pan = NodePath("../Simulation/ZoomPan")
+duration = 0.5
+transition_type = 3
+
+[node name="Stats" type="PanelContainer" parent="."]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+theme_type_variation = &"bg_panel"
 
-[node name="PanelContainer" type="PanelContainer" parent="Control2"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="CenterContainer" type="CenterContainer" parent="Stats"]
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="Stats/CenterContainer"]
+layout_mode = 2
+theme_override_constants/h_separation = 50
+theme_override_constants/v_separation = 4
+columns = 2
+
+[node name="Susceptible" type="Label" parent="Stats/CenterContainer/GridContainer"]
+layout_mode = 2
+theme_type_variation = &"text_secondary"
+theme_override_font_sizes/font_size = 20
+text = "SUSCEPTIBLE"
+vertical_alignment = 1
+
+[node name="SusceptibleValue" type="Label" parent="Stats/CenterContainer/GridContainer" node_paths=PackedStringArray("simulation_controller")]
+layout_mode = 2
+theme_type_variation = &"text_secondary"
+theme_override_font_sizes/font_size = 20
+text = "10000"
+horizontal_alignment = 2
+vertical_alignment = 1
+script = ExtResource("5_nxfk8")
+simulation_controller = NodePath("../../../../SimulationContainer/Simulation")
+
+[node name="Exposed" type="Label" parent="Stats/CenterContainer/GridContainer"]
+layout_mode = 2
+theme_type_variation = &"text_secondary"
+theme_override_font_sizes/font_size = 20
+text = "EXPOSED"
+vertical_alignment = 1
+
+[node name="ExposedValue" type="Label" parent="Stats/CenterContainer/GridContainer" node_paths=PackedStringArray("simulation_controller")]
+layout_mode = 2
+theme_type_variation = &"text_secondary"
+theme_override_font_sizes/font_size = 20
+text = "0"
+horizontal_alignment = 2
+vertical_alignment = 1
+script = ExtResource("5_nxfk8")
+state = 1
+simulation_controller = NodePath("../../../../SimulationContainer/Simulation")
+
+[node name="Infectious" type="Label" parent="Stats/CenterContainer/GridContainer"]
+layout_mode = 2
+theme_type_variation = &"text_secondary"
+theme_override_font_sizes/font_size = 20
+text = "INFECTIOUS"
+vertical_alignment = 1
+
+[node name="InfectiousValue" type="Label" parent="Stats/CenterContainer/GridContainer" node_paths=PackedStringArray("simulation_controller")]
+layout_mode = 2
+theme_type_variation = &"text_secondary"
+theme_override_font_sizes/font_size = 20
+text = "0"
+horizontal_alignment = 2
+vertical_alignment = 1
+script = ExtResource("5_nxfk8")
+state = 2
+simulation_controller = NodePath("../../../../SimulationContainer/Simulation")
+
+[node name="Removed" type="Label" parent="Stats/CenterContainer/GridContainer"]
+layout_mode = 2
+theme_type_variation = &"text_secondary"
+theme_override_font_sizes/font_size = 20
+text = "RECOVERED"
+vertical_alignment = 1
+
+[node name="RemovedValue" type="Label" parent="Stats/CenterContainer/GridContainer" node_paths=PackedStringArray("simulation_controller")]
+layout_mode = 2
+theme_type_variation = &"text_secondary"
+theme_override_font_sizes/font_size = 20
+text = "0"
+horizontal_alignment = 2
+vertical_alignment = 1
+script = ExtResource("5_nxfk8")
+state = 3
+simulation_controller = NodePath("../../../../SimulationContainer/Simulation")

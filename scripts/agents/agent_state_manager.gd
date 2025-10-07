@@ -3,6 +3,8 @@
 ##      enabling both CPU and potential GPU implementations to use a consistent state source.
 class_name AgentStateManager
 
+signal state_census_update(state: AgentState, amount_changed: int)
+
 ## Encodes SEIR stages as integers for compact storage and fast comparisons.
 ## Why: Integer enums integrate directly with PackedInt32Array for large-scale efficiency.
 enum AgentState {
@@ -30,15 +32,21 @@ var stage_timer: PackedFloat32Array
 ## Index list for agents with active stage timers to minimize per-frame checks.
 var active_timers: PackedInt32Array
 
+## Tracks agent counts per infection stage and broadcasts changes.
+var census: Census
 
 ## Initializes state arrays with all agents starting as SUSCEPTIBLE.
 ## Why: Preallocates fixed-size arrays to avoid dynamic resizing during simulation.
 func _init(agent_count_: int) -> void:
 	agent_count = agent_count_
-
+	
+	census = Census.new()
+	state_census_update.connect(census.update_census)
+	
 	states = PackedInt32Array()
 	states.resize(agent_count)
 	states.fill(AgentState.SUSCEPTIBLE)
+	state_census_update.emit(AgentState.SUSCEPTIBLE, agent_count)
 
 	stage_timer = PackedFloat32Array()
 	stage_timer.resize(agent_count)
@@ -50,6 +58,8 @@ func _init(agent_count_: int) -> void:
 ## Sets the state for a single agent and its timer if applicable.
 ## Why: Ensures stage timers are aligned with the chosen state and active_timers list reflects current needs.
 func set_state(agent_index: int, new_state: AgentState) -> void:
+	state_census_update.emit(states[agent_index], -1)
+	state_census_update.emit(new_state, 1)
 	states[agent_index] = new_state
 	var timer_min: float = state_timer_map[new_state].x
 	var timer_max: float = state_timer_map[new_state].y

@@ -20,10 +20,15 @@ gdscript/warnings/inferred_declaration=1
 
 [display]
 
+window/size/mode=3
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
+[gui]
+
+theme/custom="uid://cd86gbw8ppkb"
+theme/custom_font="uid://bo7uwf522hjxv"
+
 [rendering]
 
-textures/canvas_textures/default_texture_filter=0
 environment/defaults/default_clear_color=Color(0.15686275, 0.17254902, 0.20392157, 1)

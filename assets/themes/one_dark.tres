@@ -1,0 +1,22 @@
+[gd_resource type="Theme" load_steps=4 format=3 uid="uid://cd86gbw8ppkb"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ayp7l"]
+bg_color = Color(0.17254902, 0.19215687, 0.22745098, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gnox3"]
+bg_color = Color(0.15686275, 0.17254902, 0.20392157, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5t8m5"]
+bg_color = Color(0.12941177, 0.14509805, 0.16862746, 1)
+
+[resource]
+bg_alt/base_type = &"PanelContainer"
+bg_alt/styles/panel = SubResource("StyleBoxFlat_ayp7l")
+bg_base/base_type = &"PanelContainer"
+bg_base/styles/panel = SubResource("StyleBoxFlat_gnox3")
+bg_panel/base_type = &"PanelContainer"
+bg_panel/styles/panel = SubResource("StyleBoxFlat_5t8m5")
+text_primary/base_type = &"Label"
+text_primary/colors/font_color = Color(0.67058825, 0.69803923, 0.7490196, 1)
+text_secondary/base_type = &"Label"
+text_secondary/colors/font_color = Color(0.5176471, 0.54901963, 0.59607846, 1)

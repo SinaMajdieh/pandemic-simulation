@@ -6,7 +6,7 @@ extends Node2D
 
 ## Maps SEIR states → display colors.
 ## Why: Centralizes visual logic so state → color mapping is consistent and easy to modify.
-var state_color_map: Dictionary[AgentStateManager.AgentState, Color] = {
+static var state_color_map: Dictionary[AgentStateManager.AgentState, Color] = {
 	AgentStateManager.AgentState.SUSCEPTIBLE : Color("61AFEF"),   # Healthy baseline
 	AgentStateManager.AgentState.EXPOSED     : Color("E5C07B"),   # Incubating
 	AgentStateManager.AgentState.INFECTIOUS  : Color("E06C75"),   # Infectious / alert

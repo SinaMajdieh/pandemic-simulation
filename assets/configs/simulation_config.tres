@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="SimulationConfig" load_steps=4 format=3 uid="uid://cbnot6s7ufo4f"]
+
+[ext_resource type="Script" uid="uid://dvge2gba0gq2h" path="res://scripts/resources/infection_config.gd" id="1_10nyi"]
+[ext_resource type="Script" uid="uid://c0mr3ntsvgl0c" path="res://scripts/resources/simulation_config.gd" id="2_6e6qf"]
+
+[sub_resource type="Resource" id="Resource_mwrr7"]
+script = ExtResource("1_10nyi")
+transmission_radius = 32.0
+transmission_probability = 0.001
+max_per_cell = 64
+metadata/_custom_type_script = "uid://dvge2gba0gq2h"
+
+[resource]
+script = ExtResource("2_6e6qf")
+agent_speed = 1.0
+bounds = Vector2(700, 500)
+infection_config = SubResource("Resource_mwrr7")
+stage_durations = Dictionary[int, Vector2]({
+0: Vector2(0, 0),
+1: Vector2(8, 10),
+2: Vector2(2, 4),
+3: Vector2(0, 0)
+})
+metadata/_custom_type_script = "uid://c0mr3ntsvgl0c"

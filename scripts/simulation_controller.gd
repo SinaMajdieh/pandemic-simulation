@@ -1,4 +1,5 @@
 extends Node2D
+class_name SimulationController
 ## Main coordinator for the agent-based simulation.
 ## Purpose: Orchestrates logic (AgentManager) and visuals (AgentRenderer) as independent subsystems
 ## so each can be tuned, replaced, or moved to GPU without affecting the other.
