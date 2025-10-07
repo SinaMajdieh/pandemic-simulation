@@ -1,55 +1,75 @@
-## Main simulation coordinator.
-## Why: Separates simulation logic (AgentManager) from rendering (AgentRenderer) to
-##      allow independent performance tuning and future GPU integration without breaking visual code.
 extends Node2D
+## Main coordinator for the agent-based simulation.
+## Purpose: Orchestrates logic (AgentManager) and visuals (AgentRenderer) as independent subsystems
+## so each can be tuned, replaced, or moved to GPU without affecting the other.
 
 @export_category("Simulation Properties")
-# Simualtion configuration
 @export var simulation_config: SimulationConfig = SimulationConfig.new()
-# Simulation bound scale relative to viewport size
-@export_range(0.0, 1.0) var bounds_scale: float = 1.0
+## Holds all global parameters — injecting this allows simulation settings to be swapped at runtime.
 
-## Why: Dedicated bounds node simplifies layout control and enforces movement constraints visually and logically.
-@export var simulation_bounds: Node2D
+@export var ui_container: Control
+## Optional UI overlay container; used to measure its size for simulation world bounds.
+
 @export var cell_grid: GraphGrid
+## Grid aiding spatial partitioning for infection calculations — separation keeps the ContactTracer efficient.
 
+@export var zoom_pan: ZoomPan
+## Controls user view on simulation bounds; injected here so it can be automatically synced with config.
 
 @export_category("Rendering Properties")
-@export var radius: float = 2.0 
-## Why: Small radius prevents visual overlap at high density while still making agents distinguishable.
+@export var radius: float = 2.0
+## Chosen to avoid overlap in dense clusters while keeping agents visually distinct.
 
 @export var segments: int = 16
-## Why: Balanced segment count keeps circles moderately smooth without overtaxing mesh generation or GPU batching.
+## Segment count balances circular smoothness against mesh generation overhead.
 
-
-## Simulation state/movement handler.
 var agent_manager: AgentManager
-## MultiMesh-based renderer for agents.
+## Handles agent physics, movement, infection state transitions — the “simulation brain”.
+
 var agent_renderer: AgentRenderer
+## Draws agents using MultiMesh for efficient mass rendering.
 
-
-## Initializes simulation and rendering systems.
-## Why: Creates isolated subsystems so each can be optimized or replaced independently
-##      (e.g., GPU compute for logic, shader-based rendering for visuals).
 func _ready() -> void:
-	randomize()  # Ensures agents start with varied positions/directions for realism.
-	var screen_bounds: Vector2 = get_viewport_rect().size
-	simulation_config.bounds = screen_bounds * bounds_scale
-	simulation_bounds.size = simulation_config.bounds
-	cell_grid.custom_minimum_size = simulation_config.bounds
-	cell_grid.set_spacing(simulation_config.infection_config.transmission_radius, simulation_config.infection_config.transmission_radius) 
-	simulation_bounds.center_relative_to(screen_bounds)
+	## randomized() ensures initial positions/directions differ — prevents uniform/unnatural spread at start.
+	randomize()
+
+	## process_frame wait: ensures UI and viewport sizes are measured before bounds calculation.
+	await get_tree().process_frame
+
+	## Calculate playable bounds — depends on either viewport or containing UI.
+	simulation_config.bounds = _get_bounds()
 	
+	## Sync bounds across panning and spatial grid so view and calculations match.
+	zoom_pan.bounds = simulation_config.bounds
+	cell_grid.custom_minimum_size = simulation_config.bounds
+	
+	## Set cell grid spacing to match infection transmission radius
+	## — ensures partitioning cells align perfectly with contact detection range.
+	cell_grid.set_spacing(
+		simulation_config.infection_config.transmission_radius,
+		simulation_config.infection_config.transmission_radius
+	)
+
+	## Build core handlers — injecting config so both subsystems share identical parameters.
 	agent_manager = AgentManager.new(simulation_config)
 	agent_renderer = AgentRenderer.new(radius, segments, simulation_config.agent_count)
-	simulation_bounds.add_child(agent_renderer)
-	
-	## Why: Kickstarts outbreak dynamics without manual infection events.
-	agent_manager.state_manager.seed_stage((1 / float(simulation_config.agent_count)), AgentStateManager.AgentState.EXPOSED) # make only 1 agent exposed
+	add_child(agent_renderer)
 
+	## Auto-seed one exposed agent — avoids a “dead” simulation that needs manual triggering.
+	agent_manager.state_manager.seed_stage(
+		1.0 / float(simulation_config.agent_count),
+		AgentStateManager.AgentState.EXPOSED
+	)
 
-## Runs one simulation tick and refreshes visuals.
-## Why: Syncs physics calculations and rendering updates to prevent frame drift or visual desynchronization.
+func _get_bounds() -> Vector2:
+	## Returns simulation size based on actual UI container
+	## — fallback to viewport size for full-window simulations.
+	if not ui_container:
+		return get_viewport_rect().size
+	return ui_container.size
+
 func _process(delta: float) -> void:
-	agent_manager.advance(delta)                      
+	## Advance simulation logic before visual update
+	## — preserves temporal sync so visuals never “lag” behind simulation state.
+	agent_manager.advance(delta)
 	agent_renderer.update_from_manager(agent_manager)

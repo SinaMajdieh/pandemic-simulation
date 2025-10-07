@@ -15,7 +15,6 @@ config/features=PackedStringArray("4.5", "Forward Plus")
 
 [debug]
 
-settings/stdout/print_fps=true
 gdscript/warnings/untyped_declaration=1
 gdscript/warnings/inferred_declaration=1
 

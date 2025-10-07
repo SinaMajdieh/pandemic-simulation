@@ -1,0 +1,34 @@
+[gd_scene load_steps=2 format=3 uid="uid://dva3p76bui31w"]
+
+[ext_resource type="PackedScene" uid="uid://pumx6vjvgno2" path="res://scenes/simulation.tscn" id="1_errlg"]
+
+[node name="Control" type="GridContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+columns = 2
+
+[node name="Control" type="Control" parent="."]
+texture_filter = 1
+clip_contents = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Simulation" parent="Control" node_paths=PackedStringArray("ui_container") instance=ExtResource("1_errlg")]
+ui_container = NodePath("..")
+
+[node name="Control2" type="Control" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="PanelContainer" type="PanelContainer" parent="Control2"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
