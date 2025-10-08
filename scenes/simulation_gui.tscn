@@ -1,11 +1,13 @@
-[gd_scene load_steps=7 format=3 uid="uid://dva3p76bui31w"]
+[gd_scene load_steps=9 format=3 uid="uid://dva3p76bui31w"]
 
 [ext_resource type="PackedScene" uid="uid://pumx6vjvgno2" path="res://scenes/simulation.tscn" id="1_axkpk"]
 [ext_resource type="Theme" uid="uid://cd86gbw8ppkb" path="res://assets/themes/one_dark.tres" id="1_wo8b0"]
 [ext_resource type="Script" uid="uid://bi45lkxsa6ojy" path="res://scripts/zoom_pan.gd" id="3_iaqyx"]
 [ext_resource type="Script" uid="uid://d2yj3o0hs2ar2" path="res://scripts/simulation_ui/zoom_label.gd" id="4_0qlcw"]
+[ext_resource type="Script" uid="uid://i5gbx180p78b" path="res://scripts/simulation/fixed_step_timer.gd" id="4_smusf"]
 [ext_resource type="Script" uid="uid://dpkgjsp6sx0cv" path="res://scripts/simulation_ui/graph.gd" id="5_bdi4y"]
 [ext_resource type="Script" uid="uid://bmmxhednxx6g" path="res://scripts/simulation_ui/state_label.gd" id="5_nxfk8"]
+[ext_resource type="Script" uid="uid://bjepwkbs0evtc" path="res://scripts/simulation_ui/tick_label.gd" id="6_yidup"]
 
 [node name="Control" type="GridContainer"]
 anchors_preset = 15
@@ -24,10 +26,11 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Simulation" parent="SimulationContainer" node_paths=PackedStringArray("ui_container", "zoom_pan") instance=ExtResource("1_axkpk")]
+[node name="Simulation" parent="SimulationContainer" node_paths=PackedStringArray("ui_container", "zoom_pan", "timer") instance=ExtResource("1_axkpk")]
 ui_container = NodePath("..")
 zoom_pan = NodePath("ZoomPan")
 radius = 0.5
+timer = NodePath("FixedStepTimer")
 
 [node name="ZoomPan" type="Node2D" parent="SimulationContainer/Simulation" node_paths=PackedStringArray("target_node")]
 script = ExtResource("3_iaqyx")
@@ -36,13 +39,17 @@ min_zoom = 1.0
 max_zoom = 100.0
 limits_enabled = true
 
+[node name="FixedStepTimer" type="Node" parent="SimulationContainer/Simulation"]
+script = ExtResource("4_smusf")
+metadata/_custom_type_script = "uid://i5gbx180p78b"
+
 [node name="ZoomLabel" type="Label" parent="SimulationContainer" node_paths=PackedStringArray("zoom_pan")]
 layout_mode = 1
 offset_right = 77.0
 offset_bottom = 23.0
 theme = ExtResource("1_wo8b0")
 theme_type_variation = &"text_primary"
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 16
 text = "Zoom: 1.0"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -50,6 +57,24 @@ script = ExtResource("4_0qlcw")
 zoom_pan = NodePath("../Simulation/ZoomPan")
 duration = 0.5
 transition_type = 3
+
+[node name="TickLabel" type="Label" parent="SimulationContainer" node_paths=PackedStringArray("timer")]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -38.5
+offset_right = 38.5
+offset_bottom = 20.0
+grow_horizontal = 2
+theme = ExtResource("1_wo8b0")
+theme_type_variation = &"text_primary"
+theme_override_font_sizes/font_size = 16
+text = "Simulation Tick: 60"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("6_yidup")
+timer = NodePath("../Simulation/FixedStepTimer")
 
 [node name="Stats" type="PanelContainer" parent="."]
 layout_mode = 2

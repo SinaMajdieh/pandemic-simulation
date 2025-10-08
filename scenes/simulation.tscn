@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://pumx6vjvgno2"]
 
-[ext_resource type="Script" uid="uid://dny5q5r73lfbp" path="res://scripts/simulation_controller.gd" id="1_y5vwh"]
+[ext_resource type="Script" uid="uid://dny5q5r73lfbp" path="res://scripts/simulation/simulation_controller.gd" id="1_y5vwh"]
 [ext_resource type="Resource" uid="uid://cbnot6s7ufo4f" path="res://assets/configs/simulation_config.tres" id="2_ik8a0"]
 [ext_resource type="Script" uid="uid://osmewmqr43qt" path="res://scripts/plot/grid.gd" id="5_mwrr7"]
 

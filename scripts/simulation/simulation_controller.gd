@@ -30,6 +30,8 @@ var agent_manager: AgentManager
 var agent_renderer: AgentRenderer
 ## Draws agents using MultiMesh for efficient mass rendering.
 
+@export var timer: FixedStepTimer
+
 func _ready() -> void:
 	## randomized() ensures initial positions/directions differ — prevents uniform/unnatural spread at start.
 	randomize()
@@ -52,6 +54,7 @@ func _ready() -> void:
 	)
 
 	## Build core handlers — injecting config so both subsystems share identical parameters.
+	timer.tick.connect(_on_simulation_tick)
 	agent_manager = AgentManager.new(simulation_config)
 	agent_renderer = AgentRenderer.new(radius, segments, simulation_config.agent_count)
 	add_child(agent_renderer)
@@ -72,5 +75,8 @@ func _get_bounds() -> Vector2:
 func _process(delta: float) -> void:
 	## Advance simulation logic before visual update
 	## — preserves temporal sync so visuals never “lag” behind simulation state.
-	agent_manager.advance(delta)
+	timer.update(delta)
+
+func _on_simulation_tick(step: float) -> void:
+	agent_manager.advance(step)
 	agent_renderer.update_from_manager(agent_manager)
