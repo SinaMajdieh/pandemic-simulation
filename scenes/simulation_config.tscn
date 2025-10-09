@@ -1,0 +1,441 @@
+[gd_scene load_steps=2 format=3 uid="uid://bh6s8r8t6ogkb"]
+
+[ext_resource type="Script" uid="uid://do8edojgtxrib" path="res://scripts/simulation_ui/simulation_config_window.gd" id="1_ijp0o"]
+
+[node name="Window" type="Window" node_paths=PackedStringArray("ui_container", "agent_count_spin", "agent_speed_spin", "bounds_width_spin", "bounds_height_spin", "transmission_radius_spin", "transmission_probability_spin", "transmission_grid_button", "exposed_timer_min", "exposed_timer_max", "infectious_timer_min", "infectious_timer_max", "pause_button", "speed_multiplier_spin", "tick_spin", "run_simulation_button", "stop_simulation_button")]
+oversampling_override = 1.0
+title = "Config"
+initial_position = 4
+size = Vector2i(834, 599)
+unresizable = true
+min_size = Vector2i(556, 599)
+content_scale_aspect = 1
+script = ExtResource("1_ijp0o")
+ui_container = NodePath("SimulationConfig")
+agent_count_spin = NodePath("SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/SimulationPanel/SimulationMargin/SimulationVbox/Population/AgentCountSpin")
+agent_speed_spin = NodePath("SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/SimulationPanel/SimulationMargin/SimulationVbox/Speed/AgentSpeedSpin")
+bounds_width_spin = NodePath("SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/SimulationPanel/SimulationMargin/SimulationVbox/Bounds/BoundsValue/BoundsWidthSpin")
+bounds_height_spin = NodePath("SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/SimulationPanel/SimulationMargin/SimulationVbox/Bounds/BoundsValue/BoundsHeightSpin")
+transmission_radius_spin = NodePath("SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/InfectiousPanel/InfectiousMargin/InfectiousVBox/TransmitionRadius/TransmitionRadiusSpin")
+transmission_probability_spin = NodePath("SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/InfectiousPanel/InfectiousMargin/InfectiousVBox/InfectiousProbability/TransmissionProbabilitySpin")
+transmission_grid_button = NodePath("SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/InfectiousPanel/InfectiousMargin/InfectiousVBox/Grid/GridButton")
+exposed_timer_min = NodePath("SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/TimersPanel/TimersMargin/TimersGridContainer/ExposedMinSpin")
+exposed_timer_max = NodePath("SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/TimersPanel/TimersMargin/TimersGridContainer/ExposedMaxSpin")
+infectious_timer_min = NodePath("SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/TimersPanel/TimersMargin/TimersGridContainer/InfectiousMinSpin")
+infectious_timer_max = NodePath("SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/TimersPanel/TimersMargin/TimersGridContainer/InfectiousMaxSpin")
+pause_button = NodePath("SimulationConfig/ConfigMargin/Layout/HBoxContainer/SimulationSettingsVBox/SimulationPanel/SimulationMargin/SimulationVbox/Pause/PauseButton")
+speed_multiplier_spin = NodePath("SimulationConfig/ConfigMargin/Layout/HBoxContainer/SimulationSettingsVBox/SimulationPanel/SimulationMargin/SimulationVbox/Speed/SimulationSpeedSpin")
+tick_spin = NodePath("SimulationConfig/ConfigMargin/Layout/HBoxContainer/SimulationSettingsVBox/SimulationPanel/SimulationMargin/SimulationVbox/Tick/TickSpin")
+run_simulation_button = NodePath("SimulationConfig/ConfigMargin/Layout/Buttons/Run")
+stop_simulation_button = NodePath("SimulationConfig/ConfigMargin/Layout/Buttons/Stop")
+
+[node name="SimulationConfig" type="PanelContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_type_variation = &"bg_panel"
+
+[node name="ConfigMargin" type="MarginContainer" parent="SimulationConfig"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="Layout" type="VBoxContainer" parent="SimulationConfig/ConfigMargin"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="SimulationConfig/ConfigMargin/Layout"]
+layout_mode = 2
+
+[node name="ConfigVBox" type="VBoxContainer" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 18
+
+[node name="SimulationConfig" type="Label" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox"]
+layout_mode = 2
+theme_type_variation = &"HeaderLarge"
+text = "Simulation Config"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HSeparator2" type="HSeparator" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox"]
+layout_mode = 2
+
+[node name="SimulationPanel" type="PanelContainer" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+theme_type_variation = &"bg_alt"
+
+[node name="SimulationMargin" type="MarginContainer" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/SimulationPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="SimulationVbox" type="VBoxContainer" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/SimulationPanel/SimulationMargin"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+theme_override_constants/separation = 8
+
+[node name="Population" type="HBoxContainer" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/SimulationPanel/SimulationMargin/SimulationVbox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="AgentCount" type="Label" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/SimulationPanel/SimulationMargin/SimulationVbox/Population"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_type_variation = &"text_primary"
+text = "Population"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AgentCountSpin" type="SpinBox" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/SimulationPanel/SimulationMargin/SimulationVbox/Population"]
+layout_mode = 2
+size_flags_horizontal = 10
+size_flags_vertical = 4
+theme_type_variation = &"spin_box_primary"
+min_value = 1.0
+max_value = 30000.0
+value = 10000.0
+rounded = true
+alignment = 1
+select_all_on_focus = true
+
+[node name="Speed" type="HBoxContainer" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/SimulationPanel/SimulationMargin/SimulationVbox"]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="AgentSpeed" type="Label" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/SimulationPanel/SimulationMargin/SimulationVbox/Speed"]
+layout_mode = 2
+size_flags_horizontal = 2
+theme_type_variation = &"text_primary"
+text = "Speed"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AgentSpeedSpin" type="SpinBox" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/SimulationPanel/SimulationMargin/SimulationVbox/Speed"]
+layout_mode = 2
+size_flags_horizontal = 10
+theme_type_variation = &"spin_box_primary"
+alignment = 1
+select_all_on_focus = true
+
+[node name="Bounds" type="HBoxContainer" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/SimulationPanel/SimulationMargin/SimulationVbox"]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="Bounds" type="Label" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/SimulationPanel/SimulationMargin/SimulationVbox/Bounds"]
+layout_mode = 2
+size_flags_horizontal = 2
+theme_type_variation = &"text_primary"
+text = "Bounds"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BoundsValue" type="HBoxContainer" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/SimulationPanel/SimulationMargin/SimulationVbox/Bounds"]
+layout_mode = 2
+size_flags_horizontal = 10
+
+[node name="BoundsWidthSpin" type="SpinBox" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/SimulationPanel/SimulationMargin/SimulationVbox/Bounds/BoundsValue"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_type_variation = &"spin_box_primary"
+min_value = 100.0
+max_value = 1000.0
+value = 100.0
+alignment = 1
+select_all_on_focus = true
+
+[node name="BoundsHeightSpin" type="SpinBox" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/SimulationPanel/SimulationMargin/SimulationVbox/Bounds/BoundsValue"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_type_variation = &"spin_box_primary"
+min_value = 100.0
+max_value = 1000.0
+value = 100.0
+alignment = 1
+select_all_on_focus = true
+
+[node name="InfectiousConfig" type="Label" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox"]
+layout_mode = 2
+theme_type_variation = &"HeaderLarge"
+text = "Infectious Cofig"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox"]
+layout_mode = 2
+
+[node name="InfectiousPanel" type="PanelContainer" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+theme_type_variation = &"bg_alt"
+
+[node name="InfectiousMargin" type="MarginContainer" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/InfectiousPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="InfectiousVBox" type="VBoxContainer" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/InfectiousPanel/InfectiousMargin"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+theme_override_constants/separation = 8
+
+[node name="TransmitionRadius" type="HBoxContainer" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/InfectiousPanel/InfectiousMargin/InfectiousVBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="TransmissionRadius" type="Label" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/InfectiousPanel/InfectiousMargin/InfectiousVBox/TransmitionRadius"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_type_variation = &"text_primary"
+text = "Transmission Radius"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TransmitionRadiusSpin" type="SpinBox" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/InfectiousPanel/InfectiousMargin/InfectiousVBox/TransmitionRadius"]
+layout_mode = 2
+size_flags_horizontal = 10
+size_flags_vertical = 4
+theme_type_variation = &"spin_box_primary"
+min_value = 1.0
+max_value = 64.0
+step = 0.1
+value = 64.0
+alignment = 1
+select_all_on_focus = true
+
+[node name="InfectiousProbability" type="HBoxContainer" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/InfectiousPanel/InfectiousMargin/InfectiousVBox"]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="TransmissionProbability" type="Label" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/InfectiousPanel/InfectiousMargin/InfectiousVBox/InfectiousProbability"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_type_variation = &"text_primary"
+text = "Transmission Probability"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TransmissionProbabilitySpin" type="SpinBox" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/InfectiousPanel/InfectiousMargin/InfectiousVBox/InfectiousProbability"]
+layout_mode = 2
+size_flags_horizontal = 10
+size_flags_vertical = 4
+theme_type_variation = &"spin_box_primary"
+step = 0.1
+alignment = 1
+select_all_on_focus = true
+
+[node name="Grid" type="HBoxContainer" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/InfectiousPanel/InfectiousMargin/InfectiousVBox"]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="Grid" type="Label" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/InfectiousPanel/InfectiousMargin/InfectiousVBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 2
+theme_type_variation = &"text_primary"
+text = "Show Transmission Grid"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GridButton" type="CheckButton" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/InfectiousPanel/InfectiousMargin/InfectiousVBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"spin_box_primary"
+
+[node name="TimersConfig" type="Label" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox"]
+layout_mode = 2
+theme_type_variation = &"HeaderLarge"
+text = "Timers Config"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HSeparator3" type="HSeparator" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox"]
+layout_mode = 2
+
+[node name="TimersPanel" type="PanelContainer" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+theme_type_variation = &"bg_alt"
+
+[node name="TimersMargin" type="MarginContainer" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/TimersPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="TimersGridContainer" type="GridContainer" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/TimersPanel/TimersMargin"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+columns = 3
+
+[node name="Exposed" type="Label" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/TimersPanel/TimersMargin/TimersGridContainer"]
+layout_mode = 2
+size_flags_horizontal = 2
+theme_type_variation = &"text_primary"
+text = "Expoosed"
+
+[node name="ExposedMinSpin" type="SpinBox" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/TimersPanel/TimersMargin/TimersGridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+alignment = 1
+select_all_on_focus = true
+
+[node name="ExposedMaxSpin" type="SpinBox" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/TimersPanel/TimersMargin/TimersGridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+alignment = 1
+select_all_on_focus = true
+
+[node name="Infectious" type="Label" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/TimersPanel/TimersMargin/TimersGridContainer"]
+layout_mode = 2
+size_flags_horizontal = 2
+theme_type_variation = &"text_primary"
+text = "Infectious"
+
+[node name="InfectiousMinSpin" type="SpinBox" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/TimersPanel/TimersMargin/TimersGridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+alignment = 1
+select_all_on_focus = true
+
+[node name="InfectiousMaxSpin" type="SpinBox" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/ConfigVBox/TimersPanel/TimersMargin/TimersGridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+alignment = 1
+select_all_on_focus = true
+
+[node name="SimulationSettingsVBox" type="VBoxContainer" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 18
+
+[node name="Simulation" type="Label" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/SimulationSettingsVBox"]
+layout_mode = 2
+theme_type_variation = &"HeaderLarge"
+text = "Simulation"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HSeparator2" type="HSeparator" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/SimulationSettingsVBox"]
+layout_mode = 2
+
+[node name="SimulationPanel" type="PanelContainer" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/SimulationSettingsVBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+theme_type_variation = &"bg_alt"
+
+[node name="SimulationMargin" type="MarginContainer" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/SimulationSettingsVBox/SimulationPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="SimulationVbox" type="VBoxContainer" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/SimulationSettingsVBox/SimulationPanel/SimulationMargin"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+theme_override_constants/separation = 8
+
+[node name="Pause" type="HBoxContainer" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/SimulationSettingsVBox/SimulationPanel/SimulationMargin/SimulationVbox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="Pause" type="Label" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/SimulationSettingsVBox/SimulationPanel/SimulationMargin/SimulationVbox/Pause"]
+layout_mode = 2
+size_flags_horizontal = 2
+theme_type_variation = &"text_primary"
+text = "Pause"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PauseButton" type="CheckButton" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/SimulationSettingsVBox/SimulationPanel/SimulationMargin/SimulationVbox/Pause"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"spin_box_primary"
+
+[node name="Speed" type="HBoxContainer" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/SimulationSettingsVBox/SimulationPanel/SimulationMargin/SimulationVbox"]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="SimulationSpeed" type="Label" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/SimulationSettingsVBox/SimulationPanel/SimulationMargin/SimulationVbox/Speed"]
+layout_mode = 2
+size_flags_horizontal = 2
+theme_type_variation = &"text_primary"
+text = "Speed Multiplier"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SimulationSpeedSpin" type="SpinBox" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/SimulationSettingsVBox/SimulationPanel/SimulationMargin/SimulationVbox/Speed"]
+layout_mode = 2
+size_flags_horizontal = 10
+theme_type_variation = &"spin_box_primary"
+min_value = 0.1
+max_value = 3.0
+step = 0.1
+value = 0.1
+alignment = 1
+select_all_on_focus = true
+
+[node name="Tick" type="HBoxContainer" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/SimulationSettingsVBox/SimulationPanel/SimulationMargin/SimulationVbox"]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="Tick" type="Label" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/SimulationSettingsVBox/SimulationPanel/SimulationMargin/SimulationVbox/Tick"]
+layout_mode = 2
+size_flags_horizontal = 2
+theme_type_variation = &"text_primary"
+text = "Tick"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TickSpin" type="SpinBox" parent="SimulationConfig/ConfigMargin/Layout/HBoxContainer/SimulationSettingsVBox/SimulationPanel/SimulationMargin/SimulationVbox/Tick"]
+layout_mode = 2
+min_value = 1.0
+max_value = 60.0
+value = 1.0
+rounded = true
+alignment = 1
+select_all_on_focus = true
+
+[node name="Buttons" type="HBoxContainer" parent="SimulationConfig/ConfigMargin/Layout"]
+layout_mode = 2
+size_flags_horizontal = 8
+
+[node name="Stop" type="Button" parent="SimulationConfig/ConfigMargin/Layout/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+theme_type_variation = &"button_warning"
+text = "Stop Simulation"
+
+[node name="Run" type="Button" parent="SimulationConfig/ConfigMargin/Layout/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+theme_type_variation = &"button_primary"
+text = "Run Simulation
+"
+
+[connection signal="close_requested" from="." to="." method="_on_close"]

@@ -56,5 +56,7 @@ func bound_movement(agent_index: int) -> void:
 	var pos: Vector2 = positions[agent_index]
 	if pos.x < 0.0 or pos.x > bounds.x:
 		directions[agent_index].x = -directions[agent_index].x
+		positions[agent_index].x = clamp(pos.x, 0.0, bounds.x)
 	if pos.y < 0.0 or pos.y > bounds.y:
 		directions[agent_index].y = -directions[agent_index].y
+		positions[agent_index].y = clamp(pos.y, 0.0, bounds.y)

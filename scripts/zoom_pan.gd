@@ -1,76 +1,100 @@
 extends Node2D
 class_name ZoomPan
-## Controller for smooth zoom and pan of a target Node2D.
-## Why: This mirrors Camera2D behaviour without using an actual camera,
-## allowing scalable control by transforming the scene root directly.
 
+## Controller for smooth zoom and pan over a Node2D target.
+## Why: Provides Camera‑like view manipulation without a Camera2D,
+## transforming the scene root directly for independent scaling control.
+
+
+## Target node transformed during zoom/pan (usually scene root or gameplay layer).
 @export var target_node: Node2D
-## Target Node2D to transform (scene root or game layer).
 
+## Factor applied per mouse wheel step — constant proportional zoom behavior.
 @export var zoom_scale: float = 1.1
-## Multiplicative factor per wheel step — consistent % change regardless of current zoom.
 
+## Minimum and maximum zoom limits to prevent extreme distortion.
 @export var min_zoom: float = 0.5
 @export var max_zoom: float = 3.0
-## These define allowed visual scale range to prevent extreme zoom distortion.
 
+## Common animation time for both zoom and pan; maintains visually uniform pacing.
 @export var zoom_duration: float = 0.25
-## Shared animation time for zoom/pan — gives uniform motion pacing.
 
+## Linear transition gives predictable positional motion (no acceleration curve).
 @export var transition_type: Tween.TransitionType = Tween.TRANS_LINEAR
-## Linear transition avoids acceleration/deceleration — predictable grid movement.
 
+## Ease‑out provides quick start and gentle stop for comfortable interaction.
 @export var ease_type: Tween.EaseType = Tween.EASE_OUT
-## Ease-out ensures quick start and gentle stop for comfort during zoom/pan.
 
+
+## Current target zoom level; setter recomputes bounds and emits update signal.
 var target_zoom: float:
 	set(value):
 		target_zoom = value
 		_update_limits()
 		zoom_changed.emit(target_zoom)
-## Stores where we want to end up zoom-wise; setter recalculates bounds immediately.
 signal zoom_changed(zoom: float)
 
-var target_position: Vector2
-## The “target” position the node will animate toward during panning or zoom anchoring.
 
+## Target position the node will animate toward when dragging or anchoring during zoom.
+var target_position: Vector2
+
+## Tween objects controlling current zoom and pan animations.
 var zoom_tween: Tween
 var pan_tween: Tween
 
+
+## Toggles boundary clamping; enables free movement when disabled.
 @export var limits_enabled: bool = false:
 	set(value):
 		limits_enabled = value
 		_limit_position(target_position)
-## Toggle positional clamping; useful when free movement is allowed temporarily.
 
+
+## Local coordinate limits (left, top, right, bottom).
+## Why: Recomputed dynamically from bounds and zoom so movement remains inside world area.
 var limit_left: float = 0.0
 var limit_top: float = 0.0
 var limit_right: float = 0.0
 var limit_bottom: float = 0.0
-## Camera bounds expressed in local coordinates; recomputed via _update_limits().
 
+
+## Total world bounds and viewport size used for clamping calculations.
 var bounds: Vector2:
 	set(value):
 		bounds = value
 		_update_limits()
-## World size in pixels; must be set so clamping math works.
+var size: Vector2:
+	set(value):
+		size = value
+		_update_limits()
 
+
+## Sets world bounds and viewport size simultaneously.
+func set_sizing(new_bounds: Vector2, new_size: Vector2) -> void:
+	bounds = new_bounds
+	size = new_size
+
+
+## Initializes controller references and default positions.
+## Why: Ensures both target zoom and positional limits are synchronized before first input.
 func _ready() -> void:
 	if not target_node:
 		push_warning("ZoomPan: No target_node assigned.")
 		return
-	
 	bounds = get_viewport_rect().size
 	_update_limits()
-	
 	target_zoom = target_node.scale.x
 	target_position = target_node.position
 
+
+## Input handler managing scroll‑wheel zoom and drag‑based panning.
+## Why: Integrates camera‑like behaviour directly using mouse events.
 func _input(event: InputEvent) -> void:
 	if not target_node:
 		return
 	if not is_mouse_inside_bounds(event):
 		return
+
 	if event is InputEventMouseButton and event.is_pressed():
 		match event.button_index:
 			MOUSE_BUTTON_WHEEL_UP:
@@ -80,84 +104,77 @@ func _input(event: InputEvent) -> void:
 	elif event is InputEventMouseMotion and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 		_pan(event.relative)
 
-## Purpose: Checks whether a mouse event occurred within the defined `bounds`
-## of this node's local space — used to gate input handling so clicks/pans
-## only affect the simulation area.
+
+## Checks that a mouse event occurs within playable area bounds.
+## Why: Prevents zoom/pan from triggering when pointer is outside simulation region.
 func is_mouse_inside_bounds(event: InputEvent) -> bool:
 	if event is InputEventMouse:
-		var local_mouse_position: Vector2 = to_local(event.position)
-		# Create rectangle representing the playable/viewable area in local space.
-		# Origin at (0,0) with size `bounds` so has_point() check is straightforward.
-		var area_rect: Rect2 = Rect2(Vector2.ZERO, bounds)
-		if area_rect.has_point(local_mouse_position):
-			return true
-		else:
-			return false
+		var local_mouse: Vector2 = to_local(event.position)
+		var rect: Rect2 = Rect2(Vector2.ZERO, bounds)
+		return rect.has_point(local_mouse)
 	return false
 
+
+## Handles panning logic (drag movement).
+## Why: Divides by zoom to maintain constant pan speed in screen space.
 func _pan(relative: Vector2) -> void:
-	## Dividing by target_zoom keeps panning speed constant in screen space
-	## even when world units are scaled (otherwise pan would feel too fast/slow).
 	target_position += relative / target_zoom
 	target_position = _limit_position(target_position)
-	
+
 	if pan_tween and pan_tween.is_running():
-		pan_tween.stop()  # Prevent overlapping animations when dragging fast.
-	
+		pan_tween.stop()
 	pan_tween = create_tween()
 	pan_tween.tween_property(target_node, "position", target_position, zoom_duration)
 	pan_tween.set_trans(transition_type)
 	pan_tween.set_ease(ease_type)
 
+
+## Handles zoom‑in/zoom‑out logic with anchoring at viewport center.
+## Why: Combines scale and position transitions in parallel to keep center fixed.
 func _zoom(scale_factor: float) -> void:
 	var new_zoom: float = clamp(target_zoom * scale_factor, min_zoom, max_zoom)
 	if is_equal_approx(new_zoom, target_zoom):
 		return
-	
-	## zoom_factor is relative change — used to scale positions around anchor.
-	var zoom_factor: float = new_zoom / target_zoom
+
+	var zoom_factor: float = new_zoom / target_zoom  # relative zoom multiplier
 	target_zoom = new_zoom
-	
-	## Predict camera position after scaling around viewport center.
-	## This avoids “zoom into top-left” problem by computing offset that keeps
-	## the center of the viewport fixed in world coordinates.
-	target_position = _predict_position_after_zoom(bounds * 0.5, zoom_factor)
+	target_position = _predict_position_after_zoom(size * 0.5, zoom_factor)
 
 	if zoom_tween and zoom_tween.is_running():
 		zoom_tween.stop()
-	
-	## Parallel tween for zoom and pan — ensures both finish simultaneously.
+
 	zoom_tween = create_tween()
 	zoom_tween.tween_property(target_node, "scale", Vector2(target_zoom, target_zoom), zoom_duration)
-	zoom_tween.set_trans(transition_type) 
+	zoom_tween.set_trans(transition_type)
 	zoom_tween.set_ease(ease_type)
 	zoom_tween.parallel()
 	zoom_tween.tween_property(target_node, "position", target_position, zoom_duration)
-	zoom_tween.set_trans(transition_type) 
+	zoom_tween.set_trans(transition_type)
 	zoom_tween.set_ease(ease_type)
 
-func _predict_position_after_zoom(zoom_point: Vector2, zoom_scale_: float) -> Vector2:
-	## Why: This math changes target_position so that zoom_point (in screen coords)
-	## stays in the same place post-scale — critical for anchored zoom behaviour.
-	var local_zoom_point: Vector2 = target_position - zoom_point
-	local_zoom_point *= zoom_scale_  # Scale offset from zoom_point.
-	return _limit_position(local_zoom_point + zoom_point)
 
+## Predicts new target position so chosen zoom anchor (in screen coords) remains fixed.
+## Why: Prevents the common “zoom into corner” error by compensating world offset.
+func _predict_position_after_zoom(zoom_point: Vector2, zoom_scale_: float) -> Vector2:
+	var local_offset: Vector2 = target_position - zoom_point
+	local_offset *= zoom_scale_
+	return _limit_position(local_offset + zoom_point)
+
+
+## Recomputes positional limits based on current bounds and zoom.
+## Why: Ensures clamping remains correct when zoom level or window size changes.
 func _update_limits() -> void:
-	## Limit edges are computed in local space considering total zoom.
-	## At higher zoom, the visible area covers less world space,
-	## so bounds shrink accordingly.
 	limit_left = 0.0
 	limit_top = 0.0
-	limit_right = bounds.x * (1 - target_zoom)
-	limit_bottom = bounds.y * (1 - target_zoom)
+	limit_right = bounds.x * (1 - target_zoom) - (bounds.x - size.x)
+	limit_bottom = bounds.y * (1 - target_zoom) - (bounds.y - size.y)
 
+
+## Clamps position to defined boundaries.
+## Why: Keeps view inside world limits even after zoom‑based shrinking.
 func _limit_position(pos: Vector2) -> Vector2:
 	if not limits_enabled:
 		return pos
-	
-	## clamp() ensures pos stays between left/right and top/bottom limits.
-	## Note: limit_right/limit_bottom may be negative when zoomed in beyond view size.
 	return Vector2(
 		clamp(pos.x, limit_right, limit_left),
 		clamp(pos.y, limit_bottom, limit_top)

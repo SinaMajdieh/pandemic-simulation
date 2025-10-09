@@ -38,6 +38,9 @@ func _update_graph() -> void:
 
 # === Initialization ===
 func _ready() -> void:
+	simulation_controller.ended.connect(_on_simulation_ended)
+	simulation_controller.started.connect(_on_simulation_started)
+
 	## One-frame delay ensures viewport dimensions are finalized before adding UI children.
 	await get_tree().process_frame
 
@@ -50,17 +53,13 @@ func _ready() -> void:
 	)
 	add_child(graph_panel)  ## Attach panel so it appears in the scene immediately.
 
-	## Connect to live census data in the simulation.
-	census = simulation_controller.agent_manager.state_manager.census
-
-	## Push an initial data point before regular sampling starts.
-	_update_graph()
-
 	## Set timer until next sample — avoids double‑sampling right after init.
 	next_sample_in = sampling_rate
 
 # === Per-frame execution ===
 func _process(delta: float) -> void:
+	if simulation_controller.timer.paused:
+		return
 	_advance_interval(delta)
 
 # === Sampling interval management ===
@@ -73,3 +72,10 @@ func _advance_interval(delta: float) -> void:
 		return
 
 	next_sample_in -= delta
+
+func _on_simulation_ended() -> void:
+	graph_panel.clear()
+
+func _on_simulation_started() -> void:
+	## Connect to live census data in the simulation.
+	census = simulation_controller.agent_manager.state_manager.census

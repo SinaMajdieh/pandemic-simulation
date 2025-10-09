@@ -21,7 +21,8 @@ var _accumulator: float = 0.0
 ## Holds leftover time from frames that didn’t fill a whole tick — carried over until enough accumulates.
 ## Why accumulate: Avoids temporal drift by carrying surplus time rather than discarding it.
 
-var _alpha: float = 0.0
+var _alpha: float = 0.0:
+	get = get_alpha
 ## Interpolation factor in range [0, 1).
 ## Why store: Used by render code to interpolate between previous and current simulation states for smooth visuals.
 
@@ -58,12 +59,10 @@ func set_speed(speed_multiplier_: float = 1.0) -> void:
 
 ## Fires exactly one tick while paused — allows advancing the simulation manually frame-by-frame.
 func single_step() -> void:
-	
 	if paused:
 		tick.emit(step_seconds)
 
 
 ## Returns interpolation factor so render systems can blend between last and next state.
 func get_alpha() -> float:
-	
 	return _alpha

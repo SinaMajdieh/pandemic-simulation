@@ -11,6 +11,7 @@ config_version=5
 [application]
 
 config/name="Pandemic Sim"
+run/main_scene="uid://dva3p76bui31w"
 config/features=PackedStringArray("4.5", "Forward Plus")
 
 [debug]
@@ -20,14 +21,14 @@ gdscript/warnings/inferred_declaration=1
 
 [display]
 
-window/size/mode=3
+window/subwindows/embed_subwindows=false
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
 [gui]
 
 theme/custom="uid://cd86gbw8ppkb"
-theme/custom_font="uid://bo7uwf522hjxv"
+theme/custom_font="uid://n8u6e51fcgto"
 
 [rendering]
 
