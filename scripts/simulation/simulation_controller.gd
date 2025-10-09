@@ -68,7 +68,7 @@ func _ready() -> void:
 
 ## Launches simulation systems and applications of initial infection state.
 ## Why: Synchronizes all subsystems with the configuration bounds and infection parameters.
-func start(exposed_count: int = 100, cfg: SimulationConfig = simulation_config) -> void:
+func start(cfg: SimulationConfig = simulation_config) -> void:
 	zoom_pan.set_sizing(cfg.bounds, cfg.bounds)
 	cell_grid.custom_minimum_size = cfg.bounds
 	cell_grid.set_spacing(cfg.infection_config.transmission_radius, cfg.infection_config.transmission_radius)
@@ -82,10 +82,14 @@ func start(exposed_count: int = 100, cfg: SimulationConfig = simulation_config) 
 	add_child(agent_renderer)
 
 	agent_manager.state_manager.seed_stage(
-		exposed_count / float(cfg.agent_count),
+		cfg.initial_states[AgentStateManager.AgentState.EXPOSED] / float(cfg.agent_count),
 		AgentStateManager.AgentState.EXPOSED
 	)
-
+	agent_manager.state_manager.seed_stage(
+		cfg.initial_states[AgentStateManager.AgentState.INFECTIOUS] / float(cfg.agent_count),
+		AgentStateManager.AgentState.INFECTIOUS
+	)
+	
 	running = true
 	started.emit()
 

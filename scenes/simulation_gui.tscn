@@ -8,7 +8,7 @@
 [ext_resource type="Script" uid="uid://dpkgjsp6sx0cv" path="res://scripts/simulation_ui/graph.gd" id="5_bdi4y"]
 [ext_resource type="Script" uid="uid://bmmxhednxx6g" path="res://scripts/simulation_ui/state_label.gd" id="5_nxfk8"]
 [ext_resource type="Script" uid="uid://bjepwkbs0evtc" path="res://scripts/simulation_ui/tick_label.gd" id="6_yidup"]
-[ext_resource type="Texture2D" uid="uid://dsmccjsxvif3k" path="res://assets/icons/settings-2-svgrepo-com.svg" id="7_vkt81"]
+[ext_resource type="Texture2D" uid="uid://b2opn1tj2y3ge" path="res://assets/icons/settings.svg" id="7_vkt81"]
 [ext_resource type="Script" uid="uid://ceqvw4pufdl2b" path="res://scripts/simulation_ui/fps_label.gd" id="8_o2dld"]
 
 [node name="Control" type="GridContainer"]

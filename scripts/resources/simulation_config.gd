@@ -33,3 +33,12 @@ class_name SimulationConfig
 	AgentStateManager.AgentState.INFECTIOUS  : Vector2(3.0, 8.0),  ## full contagious period
 	AgentStateManager.AgentState.RECOVERED   : Vector2(0.0, 0.0)   ## immune stage, no timer
 }
+
+## Initial population distribution by agent state.
+## Why: Defines explicit seeding for the simulation’s starting conditions,
+## using typed dictionary keys (AgentState enum) for clarity and GPU‑safe integer storage.
+@export var initial_states: Dictionary[AgentStateManager.AgentState, int] = {
+	AgentStateManager.AgentState.EXPOSED    : 100,
+	AgentStateManager.AgentState.INFECTIOUS : 0,
+}
+

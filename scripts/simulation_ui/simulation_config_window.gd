@@ -56,6 +56,16 @@ const SCENE: PackedScene = preload("res://scenes/simulation_config.tscn")
 @export var infectious_timer_max: SpinBox
 
 
+@export_category("Initial State Config")
+
+## SpinBox controlling initial exposed agent count.
+@export var initial_exposed_spin: SpinBox
+
+## SpinBox controlling initial infectious agent count.
+@export var initial_infectious_spin: SpinBox
+
+
+
 @export_category("Simulation")
 
 ## Pause/resume toggle — directly mirrors SimulationController.timer.paused.
@@ -73,6 +83,7 @@ const SCENE: PackedScene = preload("res://scenes/simulation_config.tscn")
 ## Manual stop button for gracefully ending the simulation.
 @export var stop_simulation_button: Button
 
+@export var disable_during_simulation: Array[Node]
 
 ## Factory constructor creating a new instance of the configuration window.
 ## Why: Guarantees correct setup of dependency injection (controller + config)
@@ -112,6 +123,9 @@ func update_from_config(cfg: SimulationConfig) -> void:
 	infectious_timer_min.value = cfg.stage_durations[AgentStateManager.AgentState.INFECTIOUS].x
 	infectious_timer_max.value = cfg.stage_durations[AgentStateManager.AgentState.INFECTIOUS].y
 
+	initial_exposed_spin.value = cfg.initial_states[AgentStateManager.AgentState.EXPOSED]
+	initial_infectious_spin.value = cfg.initial_states[AgentStateManager.AgentState.INFECTIOUS]
+
 	pause_button.button_pressed = simulation_controller.timer.paused
 	speed_multiplier_spin.value = simulation_controller.timer.speed_multiplier
 	tick_spin.value = 1.0 / simulation_controller.timer.step_seconds
@@ -133,6 +147,8 @@ func _connect_signals() -> void:
 	exposed_timer_max.value_changed.connect(_on_exposed_timer_max_changed)
 	infectious_timer_min.value_changed.connect(_on_infectious_timer_min_changed)
 	infectious_timer_max.value_changed.connect(_on_infectious_timer_max_changed)
+	initial_exposed_spin.value_changed.connect(_on_initial_exposed_changed)
+	initial_infectious_spin.value_changed.connect(_on_initial_infectious_changed)
 	pause_button.toggled.connect(_on_pause_changed)
 	speed_multiplier_spin.value_changed.connect(_on_speed_multiplier_changed)
 	tick_spin.value_changed.connect(_on_tick_changed)
@@ -176,10 +192,21 @@ func _on_infectious_timer_max_changed(time: float) -> void:
 	_on_infectious_timer_changed(Vector2(infectious_timer_min.value, time))
 
 
+## Updates configuration when exposed SpinBox value changes.
+func _on_initial_exposed_changed(count: float) -> void:
+	config.initial_states[AgentStateManager.AgentState.EXPOSED] = int(count)
+
+
+## Updates configuration when infectious SpinBox value changes.
+func _on_initial_infectious_changed(count: float) -> void:
+	config.initial_states[AgentStateManager.AgentState.INFECTIOUS] = int(count)
+
+
 ## Handles simulation start: disables modification of agent count,
 ## swaps button visibility to “Stop”.
 func _on_simulation_started() -> void:
-	agent_count_spin.editable = false
+	for node: Control in disable_during_simulation:
+		node.editable = false
 	run_simulation_button.hide()
 	stop_simulation_button.show()
 
@@ -187,7 +214,8 @@ func _on_simulation_started() -> void:
 ## Handles simulation end: re‑enable agent count editing,
 ## swaps button visibility back to “Run”.
 func _on_simulation_stopped() -> void:
-	agent_count_spin.editable = true
+	for node: Control in disable_during_simulation:
+		node.editable = true
 	run_simulation_button.show()
 	stop_simulation_button.hide()
 
@@ -195,7 +223,7 @@ func _on_simulation_stopped() -> void:
 ## Invokes SimulationController.start() with preset agent count and config parameters.
 ## Why: Provides single entry point for launching core simulation logic.
 func _start_simulation() -> void:
-	simulation_controller.start(100, config)
+	simulation_controller.start(config)
 
 
 ## Hides window instead of freeing to preserve signal bindings and internal state.
