@@ -58,29 +58,38 @@ class_name SimulationConfig
 	AgentStateManager.AgentState.INFECTIOUS : 0,
 }
 
+## Builds a structured textual dictionary describing core simulation parameters.
+## Why: Enables creation of human-readable summaries for UI display (e.g. SimulationInfoWindow),
+## combining controller-level and infection-level configuration data.
+func get_description() -> Dictionary[String, String]:
+	var description: Dictionary[String, String] = {
+		"Running on": ("GPU" if contact_tracing_on_gpu else "CPU"),
+		"Population": "%d" % agent_count,
+		"Speed": "%.2f" % agent_speed,
+		"Size": "%d %s" % [int(bounds.x * bounds.y), bounds]
+	}
+
+	description.merge(infection_config.get_description())
+
+	description.merge({
+		"Incubation period": "%.2f s - %.2f s" % [
+			stage_durations[AgentStateManager.AgentState.EXPOSED].x,
+			stage_durations[AgentStateManager.AgentState.EXPOSED].y
+		],
+		"Contagious period": "%.2f s - %.2f s" % [
+			stage_durations[AgentStateManager.AgentState.INFECTIOUS].x,
+			stage_durations[AgentStateManager.AgentState.INFECTIOUS].y
+		]
+	})
+
+	return description
+
 
 ## Produces a formatted text summary of all simulation parameters.
 ## Why: A diagnostic helper for logs or GUI panels, ensuring real‑time configuration readability.
 func _to_string() -> String:
-	return """
-	===================================
-	Running on: %s
-	Population: %d
-	Average speed: %.2f
-	Size = %d %s
-	%s
-	Incubation period: %.2f s - %.2f s
-	Contagious period: %.2f s - %.2f s
-	===================================
-	""" % [
-		("GPU" if contact_tracing_on_gpu else "CPU"),
-		agent_count,
-		agent_speed,
-		int(bounds.x * bounds.y),
-		bounds,
-		infection_config.to_string(),
-		stage_durations[AgentStateManager.AgentState.EXPOSED].x,
-		stage_durations[AgentStateManager.AgentState.EXPOSED].y,
-		stage_durations[AgentStateManager.AgentState.INFECTIOUS].x,
-		stage_durations[AgentStateManager.AgentState.INFECTIOUS].y,
-	]
+	var description_string: String = ""
+	var description: Dictionary[String, String] = get_description()
+	for key: String in description.keys():
+		description_string += "%s: %s\n" % [key, description[key]]
+	return description_string

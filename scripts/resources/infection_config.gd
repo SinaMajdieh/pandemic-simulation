@@ -42,14 +42,22 @@ func _init() -> void:
 	transmission_radius_sq = transmission_radius * transmission_radius
 
 
+## Constructs a concise textual summary of infection parameters.
+## Why: Used by SimulationInfoWindow and SimulationController for displaying 
+## contagion tuning details without accessing internal resource structure.
+func get_description() -> Dictionary[String, String]:
+	return {
+		"Transmission Radius": "%.2f" % transmission_radius,
+		"Transmission Probability": "%.2f percent" % (transmission_probability * 100),
+	}
+
+
 ## Returns a readable summary string of infection parameters.
 ## Why: Useful for debug logging, UI display, and ensuring the same params
 ## are injected into compute dispatch metadata.
 func _to_string() -> String:
-	return """
-	Transmission Radius: %.2f
-	Transmission Probability: %.2f percent
-	""" % [
-		transmission_radius,
-		transmission_probability * 100.0
-	]
+	var description_string: String = ""
+	var description: Dictionary[String, String] = get_description()
+	for key: String in description.keys():
+		description_string += "%s: %s\n" % [key, description[key]]
+	return description_string

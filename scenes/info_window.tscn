@@ -1,0 +1,59 @@
+[gd_scene load_steps=2 format=3 uid="uid://hbe067g0h13e"]
+
+[ext_resource type="Script" uid="uid://bp52h41j8fjvr" path="res://scripts/ui/info_screen.gd" id="1_a7jd5"]
+
+[node name="Window" type="Window" node_paths=PackedStringArray("title_label", "value_label", "ui_container", "label_container")]
+oversampling_override = 1.0
+title = "Info"
+initial_position = 4
+size = Vector2i(200, 200)
+unresizable = true
+min_size = Vector2i(200, 200)
+script = ExtResource("1_a7jd5")
+title_label = NodePath("PanelContainer/CenterContainer/GridContainer/Label")
+value_label = NodePath("PanelContainer/CenterContainer/GridContainer/Value")
+ui_container = NodePath("PanelContainer")
+label_container = NodePath("PanelContainer/CenterContainer/GridContainer")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+offset_right = 36.0
+offset_bottom = 36.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_type_variation = &"bg_panel"
+
+[node name="CenterContainer" type="MarginContainer" parent="PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="GridContainer" type="GridContainer" parent="PanelContainer/CenterContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/h_separation = 18
+theme_override_constants/v_separation = 8
+columns = 2
+
+[node name="Label" type="Label" parent="PanelContainer/CenterContainer/GridContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_type_variation = &"text_secondary"
+text = "Title"
+vertical_alignment = 1
+
+[node name="Value" type="Label" parent="PanelContainer/CenterContainer/GridContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_type_variation = &"text_primary"
+text = "Value"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[connection signal="close_requested" from="." to="." method="_on_close"]

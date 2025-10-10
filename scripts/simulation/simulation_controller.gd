@@ -54,6 +54,9 @@ var agent_renderer: AgentRenderer
 ## Runtime configuration window shown for parameter adjustment.
 var config_window: SimulationConfigWindow
 
+## Runtime information window shown for simulation parameters.
+var info_window: SimulationInfoWindow
+
 ## Simulation runtime state flag.
 ## Why: Maintains external consistency and controls the main update loop triggers.
 var running: bool = false:
@@ -78,7 +81,7 @@ func _ready() -> void:
 ## Why: Rebuilds managers with provided parameters to synchronize bounds,
 ## infection radius, and agent population.
 func start(cfg: SimulationConfig = simulation_config) -> void:
-	print(cfg)
+	simulation_config = cfg
 	zoom_pan.set_sizing(cfg.bounds, _get_bounds())
 	cell_grid.custom_minimum_size = cfg.bounds
 	cell_grid.set_spacing(
@@ -200,6 +203,18 @@ func _open_config_window() -> void:
 	if not config_window:
 		return
 	config_window.show()
+	config_window.grab_focus()
+
+## Opens or focuses the simulation information window.
+## Why: Provides a centralized read‑only overview of the current
+func _open_info_window() -> void:
+	if info_window:
+		info_window.grab_focus()
+		return
+
+	info_window = SimulationInfoWindow.new_info_window(simulation_config.get_description())
+	add_child(info_window)
+
 
 
 ## Reports whether simulation is currently active.
