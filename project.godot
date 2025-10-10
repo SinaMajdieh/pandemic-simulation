@@ -21,6 +21,7 @@ gdscript/warnings/inferred_declaration=1
 
 [display]
 
+window/size/mode=2
 window/subwindows/embed_subwindows=false
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"

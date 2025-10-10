@@ -213,6 +213,7 @@ func _open_info_window() -> void:
 		return
 
 	info_window = SimulationInfoWindow.new_info_window(simulation_config.get_description())
+	agent_manager.contact_tracer.elapsed_time.connect(info_window.on_contact_tracing_elapsed_time)
 	add_child(info_window)
 
 

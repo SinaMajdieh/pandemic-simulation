@@ -59,7 +59,7 @@ func infect_contacts(positions: PackedVector2Array, states: PackedInt32Array) ->
 		elif states[agent_id] == AgentStateManager.AgentState.SUSCEPTIBLE:
 			exposure_chance[agent_id] = randf()
 
-
+	var start_time: int = Time.get_ticks_usec()
 	# Prepare meta buffer for GPU compute pass.
 	var meta_buffer: RID = runner.create_meta_buffer(
 		transmission_radius_sq,
@@ -87,3 +87,4 @@ func infect_contacts(positions: PackedVector2Array, states: PackedInt32Array) ->
 		if exposed_id[i] == -1:
 			continue
 		state.set_state(exposed_id[i], AgentStateManager.AgentState.EXPOSED)
+	elapsed_time.emit(Time.get_ticks_usec() - start_time)

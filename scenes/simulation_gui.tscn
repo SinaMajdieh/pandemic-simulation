@@ -3,14 +3,14 @@
 [ext_resource type="PackedScene" uid="uid://pumx6vjvgno2" path="res://scenes/simulation.tscn" id="1_axkpk"]
 [ext_resource type="Theme" uid="uid://cd86gbw8ppkb" path="res://assets/themes/one_dark.tres" id="1_wo8b0"]
 [ext_resource type="Script" uid="uid://bi45lkxsa6ojy" path="res://scripts/zoom_pan.gd" id="3_iaqyx"]
-[ext_resource type="Script" uid="uid://d2yj3o0hs2ar2" path="res://scripts/simulation_ui/zoom_label.gd" id="4_0qlcw"]
+[ext_resource type="Script" uid="uid://d2yj3o0hs2ar2" path="res://scripts/ui/zoom_label.gd" id="4_0qlcw"]
 [ext_resource type="Script" uid="uid://i5gbx180p78b" path="res://scripts/simulation/fixed_step_timer.gd" id="4_smusf"]
 [ext_resource type="Script" uid="uid://dpkgjsp6sx0cv" path="res://scripts/simulation_ui/graph.gd" id="5_bdi4y"]
-[ext_resource type="Script" uid="uid://bmmxhednxx6g" path="res://scripts/simulation_ui/state_label.gd" id="5_nxfk8"]
-[ext_resource type="Script" uid="uid://bjepwkbs0evtc" path="res://scripts/simulation_ui/tick_label.gd" id="6_yidup"]
+[ext_resource type="Script" uid="uid://bmmxhednxx6g" path="res://scripts/ui/state_label.gd" id="5_nxfk8"]
+[ext_resource type="Script" uid="uid://bjepwkbs0evtc" path="res://scripts/ui/tick_label.gd" id="6_yidup"]
 [ext_resource type="Texture2D" uid="uid://bvmde6x7w4cah" path="res://assets/icons/info.svg" id="7_icfv3"]
 [ext_resource type="Texture2D" uid="uid://b2opn1tj2y3ge" path="res://assets/icons/settings.svg" id="7_vkt81"]
-[ext_resource type="Script" uid="uid://ceqvw4pufdl2b" path="res://scripts/simulation_ui/fps_label.gd" id="8_o2dld"]
+[ext_resource type="Script" uid="uid://ceqvw4pufdl2b" path="res://scripts/ui/fps_label.gd" id="8_o2dld"]
 
 [node name="Control" type="GridContainer"]
 anchors_preset = 15

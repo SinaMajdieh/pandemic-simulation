@@ -20,6 +20,7 @@ class_name SimulationInfoWindow
 ## Why: Acts as dynamic grid display for key–value entry formatting.
 @export var label_container: Control
 
+@export var contact_tracing_time_label: Label
 
 ## Preloaded scene reference for consistent instantiation with pre-configured template.
 ## Why: Guarantees parameterized creation identical to other simulation window classes.
@@ -62,3 +63,6 @@ func _set_size() -> void:
 ## Why: Frees memory only when user explicitly closes; no need to retain temporary data.
 func _on_close() -> void:
 	queue_free()
+
+func on_contact_tracing_elapsed_time(elapsed_time_ms: int) -> void:
+	contact_tracing_time_label.text = "%.2f ms" % (elapsed_time_ms / 1000.0)

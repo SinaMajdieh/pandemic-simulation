@@ -4,6 +4,10 @@
 class_name ContactTracer
 
 
+## Elapsed time since the last contact tracer action
+signal elapsed_time(time_ms: int)
+
+
 ## Infection radius in world units.
 var transmission_radius: float:
 	set = set_transmission_radius
@@ -107,6 +111,7 @@ func _calculate_grid() -> void:
 ## Core infection logic: buckets infectious agents into cells, then tests susceptible agents
 ## against infectious ones within neighboring cells (3×3 region).
 func infect_contacts(positions: PackedVector2Array, states: PackedInt32Array) -> void:
+	var start_time: int = Time.get_ticks_usec()
 	cell_count.fill(0)
 	var sus_count: int = 0
 
@@ -166,6 +171,7 @@ func infect_contacts(positions: PackedVector2Array, states: PackedInt32Array) ->
 			if dx * dx + dy * dy <= transmission_radius_sq and randf() < contact_probability:
 				state.set_state(sus_id, AgentStateManager.AgentState.EXPOSED)
 				break
+	elapsed_time.emit(Time.get_ticks_usec() - start_time)
 
 
 ## Updates grid bounds when simulation limits change.
