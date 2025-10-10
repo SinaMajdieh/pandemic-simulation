@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://do8edojgtxrib" path="res://scripts/simulation_ui/simulation_config_window.gd" id="1_ijp0o"]
 
-[node name="Window" type="Window" node_paths=PackedStringArray("ui_container", "agent_count_spin", "agent_speed_spin", "bounds_width_spin", "bounds_height_spin", "transmission_radius_spin", "transmission_probability_spin", "transmission_grid_button", "exposed_timer_min", "exposed_timer_max", "infectious_timer_min", "infectious_timer_max", "initial_exposed_spin", "initial_infectious_spin", "pause_button", "speed_multiplier_spin", "tick_spin", "run_simulation_button", "stop_simulation_button", "disable_during_simulation")]
+[node name="Window" type="Window" node_paths=PackedStringArray("ui_container", "agent_count_spin", "agent_speed_spin", "bounds_width_spin", "bounds_height_spin", "transmission_radius_spin", "transmission_probability_spin", "transmission_grid_button", "exposed_timer_min", "exposed_timer_max", "infectious_timer_min", "infectious_timer_max", "initial_exposed_spin", "initial_infectious_spin", "pause_button", "speed_multiplier_spin", "tick_spin", "run_simulation_button", "stop_simulation_button", "contact_tracing_on_gpu_button", "disable_during_simulation")]
 oversampling_override = 1.0
 title = "Config"
 initial_position = 4
@@ -25,12 +25,13 @@ infectious_timer_min = NodePath("SimulationConfig/ConfigMargin/Layout/Panels/Tim
 infectious_timer_max = NodePath("SimulationConfig/ConfigMargin/Layout/Panels/TimerConfigVBox/TimersPanel/TimersMargin/TimersGridContainer/InfectiousMaxSpin")
 initial_exposed_spin = NodePath("SimulationConfig/ConfigMargin/Layout/Panels/InitialStateVBox/InitialSttatesPanel/InitialStateMargin/StatesVbox/Exposed/InitialExposedSpin")
 initial_infectious_spin = NodePath("SimulationConfig/ConfigMargin/Layout/Panels/InitialStateVBox/InitialSttatesPanel/InitialStateMargin/StatesVbox/Infectious/InitialInfectiousSpin")
-pause_button = NodePath("SimulationConfig/ConfigMargin/Layout/Panels/SimulationVBox/SimulationPanel/SimulationMargin/SimulationVbox/Pause/PauseButton")
+pause_button = NodePath("SimulationConfig/ConfigMargin/Layout/Panels/SimulationVBox/SimulationPanel/SimulationMargin/SimulationVbox/Pause2/PauseButton")
 speed_multiplier_spin = NodePath("SimulationConfig/ConfigMargin/Layout/Panels/SimulationVBox/SimulationPanel/SimulationMargin/SimulationVbox/Speed/SimulationSpeedSpin")
 tick_spin = NodePath("SimulationConfig/ConfigMargin/Layout/Panels/SimulationVBox/SimulationPanel/SimulationMargin/SimulationVbox/Tick/TickSpin")
 run_simulation_button = NodePath("SimulationConfig/ConfigMargin/Layout/Buttons/Run")
 stop_simulation_button = NodePath("SimulationConfig/ConfigMargin/Layout/Buttons/Stop")
-disable_during_simulation = [NodePath("SimulationConfig/ConfigMargin/Layout/Panels/SimulationConfigVBox/SimulationPanel/SimulationMargin/SimulationVbox/Population/AgentCountSpin"), NodePath("SimulationConfig/ConfigMargin/Layout/Panels/InitialStateVBox/InitialSttatesPanel/InitialStateMargin/StatesVbox/Exposed/InitialExposedSpin"), NodePath("SimulationConfig/ConfigMargin/Layout/Panels/InitialStateVBox/InitialSttatesPanel/InitialStateMargin/StatesVbox/Infectious/InitialInfectiousSpin")]
+contact_tracing_on_gpu_button = NodePath("SimulationConfig/ConfigMargin/Layout/Panels/SimulationVBox/SimulationPanel/SimulationMargin/SimulationVbox/Pause/ContactTracingOnGPU")
+disable_during_simulation = [NodePath("SimulationConfig/ConfigMargin/Layout/Panels/SimulationConfigVBox/SimulationPanel/SimulationMargin/SimulationVbox/Population/AgentCountSpin"), NodePath("SimulationConfig/ConfigMargin/Layout/Panels/InitialStateVBox/InitialSttatesPanel/InitialStateMargin/StatesVbox/Exposed/InitialExposedSpin"), NodePath("SimulationConfig/ConfigMargin/Layout/Panels/InitialStateVBox/InitialSttatesPanel/InitialStateMargin/StatesVbox/Infectious/InitialInfectiousSpin"), NodePath("SimulationConfig/ConfigMargin/Layout/Panels/SimulationVBox/SimulationPanel/SimulationMargin/SimulationVbox/Pause/ContactTracingOnGPU")]
 
 [node name="SimulationConfig" type="PanelContainer" parent="."]
 anchors_preset = 8
@@ -85,7 +86,7 @@ layout_mode = 2
 [node name="SimulationPanel" type="PanelContainer" parent="SimulationConfig/ConfigMargin/Layout/Panels/SimulationConfigVBox"]
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 0
+size_flags_vertical = 3
 theme_type_variation = &"bg_alt"
 
 [node name="SimulationMargin" type="MarginContainer" parent="SimulationConfig/ConfigMargin/Layout/Panels/SimulationConfigVBox/SimulationPanel"]
@@ -120,7 +121,7 @@ size_flags_horizontal = 10
 size_flags_vertical = 4
 theme_type_variation = &"spin_box_primary"
 min_value = 1.0
-max_value = 30000.0
+max_value = 100000.0
 value = 10000.0
 rounded = true
 alignment = 1
@@ -142,6 +143,7 @@ vertical_alignment = 1
 layout_mode = 2
 size_flags_horizontal = 10
 theme_type_variation = &"spin_box_primary"
+max_value = 10000.0
 alignment = 1
 select_all_on_focus = true
 
@@ -166,7 +168,7 @@ layout_mode = 2
 size_flags_horizontal = 4
 theme_type_variation = &"spin_box_primary"
 min_value = 100.0
-max_value = 1000.0
+max_value = 10000.0
 value = 100.0
 alignment = 1
 select_all_on_focus = true
@@ -176,7 +178,7 @@ layout_mode = 2
 size_flags_horizontal = 4
 theme_type_variation = &"spin_box_primary"
 min_value = 100.0
-max_value = 1000.0
+max_value = 10000.0
 value = 100.0
 alignment = 1
 select_all_on_focus = true
@@ -199,7 +201,7 @@ layout_mode = 2
 [node name="SimulationPanel" type="PanelContainer" parent="SimulationConfig/ConfigMargin/Layout/Panels/SimulationVBox"]
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 0
+size_flags_vertical = 3
 theme_type_variation = &"bg_alt"
 
 [node name="SimulationMargin" type="MarginContainer" parent="SimulationConfig/ConfigMargin/Layout/Panels/SimulationVBox/SimulationPanel"]
@@ -220,7 +222,25 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 
-[node name="Pause" type="Label" parent="SimulationConfig/ConfigMargin/Layout/Panels/SimulationVBox/SimulationPanel/SimulationMargin/SimulationVbox/Pause"]
+[node name="ContactTracing" type="Label" parent="SimulationConfig/ConfigMargin/Layout/Panels/SimulationVBox/SimulationPanel/SimulationMargin/SimulationVbox/Pause"]
+layout_mode = 2
+size_flags_horizontal = 2
+theme_type_variation = &"text_primary"
+text = "GPU accelerated"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ContactTracingOnGPU" type="CheckButton" parent="SimulationConfig/ConfigMargin/Layout/Panels/SimulationVBox/SimulationPanel/SimulationMargin/SimulationVbox/Pause"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"spin_box_primary"
+
+[node name="Pause2" type="HBoxContainer" parent="SimulationConfig/ConfigMargin/Layout/Panels/SimulationVBox/SimulationPanel/SimulationMargin/SimulationVbox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="Pause" type="Label" parent="SimulationConfig/ConfigMargin/Layout/Panels/SimulationVBox/SimulationPanel/SimulationMargin/SimulationVbox/Pause2"]
 layout_mode = 2
 size_flags_horizontal = 2
 theme_type_variation = &"text_primary"
@@ -228,7 +248,7 @@ text = "Pause"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="PauseButton" type="CheckButton" parent="SimulationConfig/ConfigMargin/Layout/Panels/SimulationVBox/SimulationPanel/SimulationMargin/SimulationVbox/Pause"]
+[node name="PauseButton" type="CheckButton" parent="SimulationConfig/ConfigMargin/Layout/Panels/SimulationVBox/SimulationPanel/SimulationMargin/SimulationVbox/Pause2"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"spin_box_primary"
@@ -250,7 +270,6 @@ layout_mode = 2
 size_flags_horizontal = 10
 theme_type_variation = &"spin_box_primary"
 min_value = 0.1
-max_value = 3.0
 step = 0.1
 value = 0.1
 alignment = 1
@@ -330,7 +349,7 @@ size_flags_horizontal = 10
 size_flags_vertical = 4
 theme_type_variation = &"spin_box_primary"
 min_value = 1.0
-max_value = 64.0
+max_value = 1000.0
 step = 0.1
 value = 64.0
 alignment = 1
@@ -425,7 +444,7 @@ vertical_alignment = 1
 layout_mode = 2
 size_flags_horizontal = 10
 theme_type_variation = &"spin_box_primary"
-max_value = 10000.0
+max_value = 100000.0
 value = 1.0
 alignment = 1
 select_all_on_focus = true
@@ -447,8 +466,7 @@ vertical_alignment = 1
 layout_mode = 2
 size_flags_horizontal = 10
 theme_type_variation = &"spin_box_primary"
-max_value = 10000.0
-value = 1.0
+max_value = 100000.0
 alignment = 1
 select_all_on_focus = true
 
@@ -495,12 +513,14 @@ text = "Expoosed"
 [node name="ExposedMinSpin" type="SpinBox" parent="SimulationConfig/ConfigMargin/Layout/Panels/TimerConfigVBox/TimersPanel/TimersMargin/TimersGridContainer"]
 layout_mode = 2
 size_flags_horizontal = 8
+max_value = 1000.0
 alignment = 1
 select_all_on_focus = true
 
 [node name="ExposedMaxSpin" type="SpinBox" parent="SimulationConfig/ConfigMargin/Layout/Panels/TimerConfigVBox/TimersPanel/TimersMargin/TimersGridContainer"]
 layout_mode = 2
 size_flags_horizontal = 8
+max_value = 1000.0
 alignment = 1
 select_all_on_focus = true
 
@@ -513,12 +533,14 @@ text = "Infectious"
 [node name="InfectiousMinSpin" type="SpinBox" parent="SimulationConfig/ConfigMargin/Layout/Panels/TimerConfigVBox/TimersPanel/TimersMargin/TimersGridContainer"]
 layout_mode = 2
 size_flags_horizontal = 8
+max_value = 1000.0
 alignment = 1
 select_all_on_focus = true
 
 [node name="InfectiousMaxSpin" type="SpinBox" parent="SimulationConfig/ConfigMargin/Layout/Panels/TimerConfigVBox/TimersPanel/TimersMargin/TimersGridContainer"]
 layout_mode = 2
 size_flags_horizontal = 8
+max_value = 1000.0
 alignment = 1
 select_all_on_focus = true
 

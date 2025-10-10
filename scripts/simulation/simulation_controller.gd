@@ -1,63 +1,71 @@
+## Primary orchestrator node managing all simulation systems.
+## Why: Central entrypoint that binds agent logic, rendering, infection control,
+## timing, and configuration into one synchronized runtime environment.
 extends Node2D
 class_name SimulationController
 
-## Lifecycle signals used for orchestration and UI synchronization.
+
+## Signals emitted at start and end of simulation runtime.
+## Why: Used for UI synchronization and event‑based control across external widgets.
 signal started()
 signal ended()
 
 
-## Central manager coordinating all simulation subsystems.
-## Why: Separates logic (AgentManager) from rendering (AgentRenderer) to enable
-## independent optimization or GPU migration later.
 @export_category("Simulation Properties")
 
-## Global simulation configuration — passed so runtime swapping of parameters is possible.
+## Central configuration resource controlling simulation parameters.
+## Why: Enables runtime swapping of parameter sets without rebuilding internal structures.
 @export var simulation_config: SimulationConfig = SimulationConfig.new()
 
-## Optional UI parent controlling layout and sizing; defines simulation world bounds.
+## Optional UI container controlling viewport sizing and world limits.
+## Why: Provides dynamic bounds derived from a Control node, allowing adaptive scaling.
 @export var ui_container: Control
 
-## Spatial grid assisting ContactTracer by partitioning space for local proximity checks.
-## Why: Limits infection lookup to nearby cells, improving O(n) performance.
+## Spatial grid reference assisting the ContactTracer system.
+## Why: Enables localized proximity search within cells to preserve O(n) efficiency.
 @export var cell_grid: GraphGrid
 
-## View transformation controller; auto‑synced with simulation bounds for user navigation.
+## View navigation controller managing zoom and pan operations.
+## Why: Keeps viewport alignment consistent with simulation world coordinates.
 @export var zoom_pan: ZoomPan
 
 
 @export_category("Rendering Properties")
 
-## Visual radius of agents in world units.
-## Why: Balanced to maintain visibility in dense populations without overlap.
+## Visual radius of each agent.
+## Why: Tuned for readability; balances density versus clarity of overlapping sprites.
 @export var radius: float = 2.0
 
-## Polygon smoothness for circular agent meshes — higher values improve presentation but cost CPU.
+## Polygon smoothness (segment count) for drawn agents.
+## Why: Increasing improves circular fidelity; traded off against CPU overhead.
 @export var segments: int = 16
 
 
-## Logic handler executing movement, infection transition, and state updates.
+## Core manager in charge of updating agent logic and infection state transitions.
 var agent_manager: AgentManager
 
-## Efficient renderer using MultiMesh for visualizing all agents each frame.
+## Renderer using MultiMesh for efficient per‑frame agent drawing.
 var agent_renderer: AgentRenderer
 
-## Fixed‑step timer maintaining tick consistency regardless of frame rate.
+## Fixed‑step timer ensuring deterministic tick progression.
+## Why: Keeps logic independent of rendering frame rate fluctuations.
 @export var timer: FixedStepTimer
 
-## Active configuration window used for runtime parameter tuning.
+## Runtime configuration window shown for parameter adjustment.
 var config_window: SimulationConfigWindow
 
-## Simulation running switch; get method ensures external consistency.
+## Simulation runtime state flag.
+## Why: Maintains external consistency and controls the main update loop triggers.
 var running: bool = false:
 	get = is_running
 
 
-## Initialization entry point.
-## Why: Builds subsystems after UI sizing stabilizes, connects timer, and prepares the config window.
+## Initializes simulation context and sets up window and connections.
+## Why: Waits one frame for valid viewport sizing, constructs subsystems,
+## and connects tick timing before automatic launch.
 func _ready() -> void:
-	randomize()  # Ensures unique initial positions per run.
-	await get_tree().process_frame  # Wait to obtain valid viewport/container dimensions.
-	simulation_config.bounds = _get_bounds()
+	randomize()  # Guarantees unique initial conditions per run.
+	await get_tree().process_frame  # Stabilizes layout before measurement.
 	timer.tick.connect(_on_simulation_tick)
 
 	config_window = SimulationConfigWindow.new_window(self, simulation_config)
@@ -66,14 +74,20 @@ func _ready() -> void:
 	start()
 
 
-## Launches simulation systems and applications of initial infection state.
-## Why: Synchronizes all subsystems with the configuration bounds and infection parameters.
+## Starts simulation execution and applies configuration values.
+## Why: Rebuilds managers with provided parameters to synchronize bounds,
+## infection radius, and agent population.
 func start(cfg: SimulationConfig = simulation_config) -> void:
-	zoom_pan.set_sizing(cfg.bounds, cfg.bounds)
+	print(cfg)
+	zoom_pan.set_sizing(cfg.bounds, _get_bounds())
 	cell_grid.custom_minimum_size = cfg.bounds
-	cell_grid.set_spacing(cfg.infection_config.transmission_radius, cfg.infection_config.transmission_radius)
+	cell_grid.set_spacing(
+		cfg.infection_config.transmission_radius,
+		cfg.infection_config.transmission_radius
+	)
 
 	agent_manager = AgentManager.new(cfg)
+
 	if agent_renderer:
 		remove_child(agent_renderer)
 		agent_renderer.queue_free()
@@ -89,36 +103,37 @@ func start(cfg: SimulationConfig = simulation_config) -> void:
 		cfg.initial_states[AgentStateManager.AgentState.INFECTIOUS] / float(cfg.agent_count),
 		AgentStateManager.AgentState.INFECTIOUS
 	)
-	
+
 	running = true
 	started.emit()
 
 
-## Gracefully stops the simulation and frees rendering resources.
+## Gracefully stops active simulation and hides renderer.
+## Why: Maintains system integrity and avoids freeing nodes mid‑loop.
 func end() -> void:
 	agent_renderer.hide()
 	running = false
 	ended.emit()
 
 
-## Toggles simulation pause state without altering tick rate.
-## Why: Keeps logic suspended while preserving time configuration.
+## Pauses or resumes ticking while retaining timing configuration.
+## Why: Provides user control to inspect intermediate frames without losing synchronization.
 func set_pause(paused: bool) -> void:
 	if timer.paused == paused:
 		return
 	timer.set_paused(paused)
 
 
-## Obtains current world bounds.
-## Why: Uses UI container when available, falling back to viewport for autonomous mode.
+## Returns current spatial world bounds.
+## Why: Uses UI container size if present, otherwise defaults to viewport size.
 func _get_bounds() -> Vector2:
 	if not ui_container:
 		return get_viewport_rect().size
 	return ui_container.size
 
 
-## Frame‑based update bridging logic and renderer using fixed step interpolation.
-## Why: Maintains temporal stability and aligns visuals to logic progression.
+## Per‑frame update linking logic tick interpolation to rendering state.
+## Why: Keeps smooth temporal blending between discrete simulation steps.
 func _process(delta: float) -> void:
 	if not is_running():
 		return
@@ -127,64 +142,73 @@ func _process(delta: float) -> void:
 		agent_renderer.update_from_manager(timer.get_alpha(), timer.step_seconds)
 
 
-## Executes logic tick per fixed update.
-## Why: Keeps changes deterministic regardless of frame fluctuation.
+## Executes one logic tick triggered by FixedStepTimer.
+## Why: Updates state deterministically relative to elapsed simulation time.
 func _on_simulation_tick(step: float) -> void:
 	if agent_manager:
 		agent_manager.advance(step)
-	# agent_renderer.update_from_manager()  # Optional deferred sync
 
 
-## Adjusts overall movement speed multiplier for agents.
+## Adjusts baseline movement speed for all agents.
+## Why: Used by sliders or UI widgets to change pacing dynamically.
 func set_speed(speed: float) -> void:
 	agent_manager.set_speed(speed)
 
 
-## Updates spatial boundaries in all relevant systems.
+## Updates simulation bounds for all dependent systems.
+## Why: Propagates to grid, zoom controls, and movement constraints.
 func set_bounds(bounds: Vector2) -> void:
 	cell_grid.custom_minimum_size = bounds
 	zoom_pan.bounds = bounds
 	agent_manager.set_bounds(bounds)
 
 
-## Scales tick progression rate for time dilation effects.
+## Modifies fixed‑step tick rate multiplier to simulate time dilation.
+## Why: Provides smooth slow‑motion or acceleration effects.
 func set_speed_multiplier(multiplier: float) -> void:
 	timer.speed_multiplier = multiplier
 
 
-## Changes duration between logic ticks.
+## Sets logical timestep duration directly.
+## Why: Adjusts frequency of simulation logic ticks while keeping renderer consistent.
 func set_tick(step_seconds: float) -> void:
 	timer.step_seconds = step_seconds
 
 
-## Updates infection spread radius across both logical and visual subsystems.
+## Updates infection radius across logic and grid systems.
+## Why: Keeps spatial proximity computations consistent after parameter changes.
 func set_transmission_radius(transmission_radius: float) -> void:
 	agent_manager.set_transmission_radius(transmission_radius)
 	cell_grid.set_spacing(transmission_radius, transmission_radius)
 
 
-## Sets probability of infection globally.
+## Adjusts infection transmission probability globally.
+## Why: Reapplies contagiousness factor to current infection algorithm.
 func set_transmission_probability(probability: float) -> void:
 	agent_manager.set_transmission_probability(probability)
 
 
-## Updates duration range per SEIR stage in the agent state manager.
+## Updates incubation or contagious stage timers in AgentStateManager.
+## Why: Allows per‑state, real‑time tuning of duration ranges.
 func set_state_timer(state: AgentStateManager.AgentState, state_timer: Vector2) -> void:
 	agent_manager.set_state_timer(state, state_timer)
 
 
-## Opens configuration window for runtime parameter editing.
+## Opens configuration window for in‑game parameter editing.
+## Why: Safely checks existence before revealing UI dialog.
 func _open_config_window() -> void:
 	if not config_window:
 		return
 	config_window.show()
 
 
-## Returns whether simulation is currently active.
+## Reports whether simulation is currently active.
+## Why: Ensures external query consistency for UI and scheduling widgets.
 func is_running() -> bool:
 	return running
 
 
-## Displays or hides infection grid overlay.
+## Shows or hides infection grid overlay visualization.
+## Why: Toggles between performance mode and diagnostic inspection mode.
 func set_grid_visibility(grid_visible: bool) -> void:
 	cell_grid.visible = grid_visible

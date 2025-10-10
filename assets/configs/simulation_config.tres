@@ -6,17 +6,22 @@
 [sub_resource type="Resource" id="Resource_mwrr7"]
 script = ExtResource("1_10nyi")
 transmission_radius = 7.0
+transmission_probability = 0.1
 metadata/_custom_type_script = "uid://dvge2gba0gq2h"
 
 [resource]
 script = ExtResource("2_6e6qf")
 agent_speed = 10.0
-bounds = Vector2(700, 500)
+bounds = Vector2(600, 600)
 infection_config = SubResource("Resource_mwrr7")
 stage_durations = Dictionary[int, Vector2]({
 0: Vector2(0, 0),
 1: Vector2(8, 10),
 2: Vector2(2, 4),
 3: Vector2(0, 0)
+})
+initial_states = Dictionary[int, int]({
+1: 50,
+2: 0
 })
 metadata/_custom_type_script = "uid://c0mr3ntsvgl0c"
