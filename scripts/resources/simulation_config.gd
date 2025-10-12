@@ -99,6 +99,37 @@ func to_dictionary() -> Dictionary:
 	return results
 
 
+func from_dictionary(dictionary: Dictionary) -> void:
+		## Basic numeric + vector restoration.
+	## Why: Reconstructs primary simulation setup values.
+	if dictionary.has("agent_count"):
+		agent_count = int(dictionary["agent_count"])
+	if dictionary.has("agent_speed"):
+		agent_speed = float(dictionary["agent_speed"])
+	if dictionary.has("bounds"):
+		var bounds_dictionary: Dictionary = dictionary["bounds"]
+		bounds = Vector2(float(bounds_dictionary["x"]), float(bounds_dictionary["y"]))
+
+	## Nested infection resource reconstruction.
+	## Why: Fully reinstates InfectionConfig from serialized JSON.
+	if dictionary.has("infection_config") and infection_config and infection_config.has_method("from_dictionary"):
+		infection_config.from_dictionary(dictionary["infection_config"])
+
+	## Stage duration reconstruction.
+	## Why: Restores per‑stage timing ranges from saved JSON.
+	if dictionary.has("stage_durations"):
+		var stage_durations_dictionary: Dictionary = dictionary["stage_durations"]
+		for key: Variant in stage_durations_dictionary.keys():
+			var duration: Dictionary = stage_durations_dictionary[key]
+			stage_durations[int(key)] = Vector2(float(duration["min"]), float(duration["max"]))
+
+	## Initial state reconstruction.
+	## Why: Restores startup population distribution for deterministic replays.
+	if dictionary.has("initial_states"):
+		var initial_states_dictionary: Dictionary = dictionary["initial_states"]
+		for key: Variant in initial_states_dictionary.keys():
+			initial_states[int(key)] = int(initial_states_dictionary[key])
+
 ## Converts the simulation parameters dictionary to JSON.
 ## Why: Prepares a persistent representation for saving/loading presets or replays.
 func to_json(pretty: bool = true) -> String:
@@ -117,33 +148,4 @@ func from_json(json_string: String) -> void:
 
 	var dictionary: Dictionary = result
 
-	## Basic numeric + vector restoration.
-	## Why: Reconstructs primary simulation setup values.
-	if dictionary.has("agent_count"):
-		agent_count = int(dictionary["agent_count"])
-	if dictionary.has("agent_speed"):
-		agent_speed = float(dictionary["agent_speed"])
-	if dictionary.has("bounds"):
-		var bounds_dictionary: Dictionary = dictionary["bounds"]
-		bounds = Vector2(float(bounds_dictionary["x"]), float(bounds_dictionary["y"]))
-
-	## Nested infection resource reconstruction.
-	## Why: Fully reinstates InfectionConfig from serialized JSON.
-	if dictionary.has("infection_config") and infection_config and infection_config.has_method("from_json"):
-		var sub_json: String = JSON.stringify(dictionary["infection_config"])
-		infection_config.from_json(sub_json)
-
-	## Stage duration reconstruction.
-	## Why: Restores per‑stage timing ranges from saved JSON.
-	if dictionary.has("stage_durations"):
-		var stage_durations_dictionary: Dictionary = dictionary["stage_durations"]
-		for key: Variant in stage_durations_dictionary.keys():
-			var duration: Dictionary = stage_durations_dictionary[key]
-			stage_durations[int(key)] = Vector2(float(duration["min"]), float(duration["max"]))
-
-	## Initial state reconstruction.
-	## Why: Restores startup population distribution for deterministic replays.
-	if dictionary.has("initial_states"):
-		var initial_states_dictionary: Dictionary = dictionary["initial_states"]
-		for key: Variant in initial_states_dictionary.keys():
-			initial_states[int(key)] = int(initial_states_dictionary[key])
+	from_dictionary(dictionary)

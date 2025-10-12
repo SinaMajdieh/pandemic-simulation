@@ -60,6 +60,13 @@ func to_dictionary() -> Dictionary:
 	return results
 
 
+func from_dictionary(dictionary: Dictionary) -> void:
+	if dictionary.has("transmission_radius"):
+		transmission_radius = float(dictionary["transmission_radius"])
+	if dictionary.has("transmission_probability"):
+		transmission_probability = float(dictionary["transmission_probability"])
+
+
 ## Converts dictionary to JSON for persistence or inspection.
 ## Why: Supports configuration saving and deterministic simulation replay.
 func to_json(pretty: bool = true) -> String:
@@ -76,20 +83,4 @@ func from_json(json_string: String) -> void:
 		push_error("InfectiousConfig.from_json(): Invalid JSON format.")
 		return
 	var dictionary: Dictionary = result
-
-	if dictionary.has("transmission_radius"):
-		transmission_radius = float(dictionary["transmission_radius"])
-	if dictionary.has("transmission_probability"):
-		transmission_probability = float(dictionary["transmission_probability"])
-
-
-## Loads configuration from a JSON file path.
-## Why: Provides direct disk-loading alternative for preset or replay configuration files.
-func load_from_json(path: String) -> void:
-	if not FileAccess.file_exists(path):
-		push_error("InfectiousConfig.load_from_json(): File not found: %s" % path)
-		return
-	var file: FileAccess = FileAccess.open(path, FileAccess.READ)
-	var content: String = file.get_as_text()
-	file.close()
-	from_json(content)
+	from_dictionary(dictionary)
