@@ -1,68 +1,79 @@
+## Deterministic timer emitting fixed‑step ticks independent of frame rate.
+## Why: Keeps simulation updates consistent regardless of rendering performance.
 extends Node
 class_name FixedStepTimer
-## Emits a fixed-step `tick` signal for deterministic simulation updates, decoupled from Godot's frame rate.
-## Why: Ensures simulation logic runs at consistent time intervals regardless of rendering performance.
 
+## Fired each fixed step; carries step length for consumers.
 signal tick(step_seconds: float)
-## Emitted once per fixed step, passing the step duration as a parameter.
 
+## Fixed tick duration (default 60 Hz).
+## Why: Defines discrete simulation interval.
 @export var step_seconds: float = 1.0 / 60.0
-## Length of each simulation tick in seconds — 1/60 = 60 ticks per second.
-## Why export: Allows quick tuning from the editor without code changes.
 
+## Time‑scaling multiplier for speeding/slowing simulation.
+## Why: Enables fast‑forward or slow‑motion effects.
 @export var speed_multiplier: float = 1.0
-## Multiplies delta time before accumulation — use to speed up or slow down simulation
-## without changing `step_seconds` (e.g., for fast-forward or slow-motion).
 
+## Pauses ticking completely.
+## Why: Supports controlled manual stepping/debug break.
 @export var paused: bool = false
-## If true, halts normal ticking until resumed — single-step still possible.
 
+## Carries unprocessed frame time to maintain deterministic ticking.
+## Why: Prevents loss of fractional delta between frames.
 var _accumulator: float = 0.0
-## Holds leftover time from frames that didn’t fill a whole tick — carried over until enough accumulates.
-## Why accumulate: Avoids temporal drift by carrying surplus time rather than discarding it.
 
+## Fraction toward next tick for smooth render interpolation.
+## Why: Used to blend visual states between logic frames.
 var _alpha: float = 0.0:
 	get = get_alpha
-## Interpolation factor in range [0, 1).
-## Why store: Used by render code to interpolate between previous and current simulation states for smooth visuals.
+
+## Sequential tick counter for diagnostics and replay tracking.
+var _tick_index: int = 0:
+	get = get_tick
 
 
-## Called every rendered frame with its real-world duration.
+## Converts frame delta into one or more fixed ticks.
 func update(delta: float) -> void:
 	if paused:
 		return
 	
-	## Scale delta by speed multiplier for fast-forward/slow-motion effects.
-	_accumulator += delta * speed_multiplier
-	
-	## Use while-loop instead of if:
-	## Why: If frame delta is large (slow frame), multiple ticks may be needed to catch up
-	## in one update call — prevents simulation from lagging behind real time.
-	while _accumulator >= step_seconds:
-		tick.emit(step_seconds)     ## Fire logic update at fixed interval.
+	_accumulator += delta * speed_multiplier        # Apply speed control to elapsed time.
+	while _accumulator >= step_seconds:             # Catch up one or more ticks if lagged.
+		tick.emit(step_seconds)
+		_tick_index += 1
 		_accumulator -= step_seconds
 	
-	## Compute fraction of next tick elapsed — used for smooth interpolation in visuals.
-	_alpha = _accumulator / step_seconds
+	_alpha = _accumulator / step_seconds            # Compute interpolation ratio for visuals.
 
 
-## Pauses or resumes ticking — useful for debugging or manual control.
+## Toggles pause state.
 func set_paused(paused_: bool = true) -> void:
-	
 	paused = paused_
 
 
-## Adjusts playback speed without disturbing tick length.
+## Adjusts playback speed dynamically.
 func set_speed(speed_multiplier_: float = 1.0) -> void:
 	speed_multiplier = speed_multiplier_
 
 
-## Fires exactly one tick while paused — allows advancing the simulation manually frame-by-frame.
+## Emits exactly one tick while paused (manual step).
 func single_step() -> void:
 	if paused:
 		tick.emit(step_seconds)
 
 
-## Returns interpolation factor so render systems can blend between last and next state.
+## Returns render interpolation fraction.
 func get_alpha() -> float:
 	return _alpha
+
+
+## Returns current tick index.
+func get_tick() -> int:
+	return _tick_index
+
+
+## Resets internal counters and time accumulation.
+func reset() -> void:
+	_accumulator = 0.0
+	_alpha = 0.0
+	_tick_index = 0
