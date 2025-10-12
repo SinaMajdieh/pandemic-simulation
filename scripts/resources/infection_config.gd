@@ -15,11 +15,9 @@ class_name InfectionConfig
 		transmission_radius = value
 		transmission_radius_sq = transmission_radius * transmission_radius
 
-
 ## Probability of infection per valid contact (1.0 = guaranteed infection).
 ## Why: Controls stochastic infection chance, tuned for realism or acceleration.
 @export var transmission_probability: float = 0.0005
-
 
 ## Maximum count of infectious agents stored per spatial grid cell.
 ## Why: Ensures deterministic buffer allocation and safeguards against overflow
@@ -42,22 +40,56 @@ func _init() -> void:
 	transmission_radius_sq = transmission_radius * transmission_radius
 
 
-## Constructs a concise textual summary of infection parameters.
-## Why: Used by SimulationInfoWindow and SimulationController for displaying 
-## contagion tuning details without accessing internal resource structure.
-func get_description() -> Dictionary[String, String]:
-	return {
-		"Transmission Radius": "%.2f" % transmission_radius,
-		"Transmission Probability": "%.2f percent" % (transmission_probability * 100),
-	}
-
-
 ## Returns a readable summary string of infection parameters.
 ## Why: Useful for debug logging, UI display, and ensuring the same params
 ## are injected into compute dispatch metadata.
 func _to_string() -> String:
 	var description_string: String = ""
-	var description: Dictionary[String, String] = get_description()
+	var description: Dictionary[String, String] = ConfigInfo.get_infection_description(self)
 	for key: String in description.keys():
 		description_string += "%s: %s\n" % [key, description[key]]
 	return description_string
+
+
+## Serializes infection parameters to dictionary form.
+## Why: Produces simple structured output suitable for JSON encoding.
+func to_dictionary() -> Dictionary:
+	var results: Dictionary = {}
+	results["transmission_radius"] = transmission_radius
+	results["transmission_probability"] = transmission_probability
+	return results
+
+
+## Converts dictionary to JSON for persistence or inspection.
+## Why: Supports configuration saving and deterministic simulation replay.
+func to_json(pretty: bool = true) -> String:
+	var dictionary: Dictionary = to_dictionary()
+	var json_string: String = JSON.stringify(dictionary, "\t" if pretty else "", pretty)
+	return json_string
+
+
+## Loads configuration fields from a JSON string.
+## Why: Restores exported infection settings from a previous simulation or saved preset.
+func from_json(json_string: String) -> void:
+	var result: Variant = JSON.parse_string(json_string)
+	if result == null:
+		push_error("InfectiousConfig.from_json(): Invalid JSON format.")
+		return
+	var dictionary: Dictionary = result
+
+	if dictionary.has("transmission_radius"):
+		transmission_radius = float(dictionary["transmission_radius"])
+	if dictionary.has("transmission_probability"):
+		transmission_probability = float(dictionary["transmission_probability"])
+
+
+## Loads configuration from a JSON file path.
+## Why: Provides direct disk-loading alternative for preset or replay configuration files.
+func load_from_json(path: String) -> void:
+	if not FileAccess.file_exists(path):
+		push_error("InfectiousConfig.load_from_json(): File not found: %s" % path)
+		return
+	var file: FileAccess = FileAccess.open(path, FileAccess.READ)
+	var content: String = file.get_as_text()
+	file.close()
+	from_json(content)
