@@ -1,101 +1,146 @@
 # Pandemic Simulation
 
-![Pandemic Simulation Demo](assets/demo/pandemic_sim_demo.gif)
+![Pandemic Simulation Demo](assets/demo/demo.gif)
+![Real-time Parameter Tuning](assets/demo/simulation_parameter_tuning.gif)
+![Real-time Parameter Tuning](assets/demo/simulation_parameter_tuning_2.gif)
 
 ## Introduction
 
-This project is a fully real‑time, tick‑based pandemic simulation built entirely in the Godot Engine using pure GDScript.
+This project is a fully real‑time, tick‑based pandemic simulation built entirely in the Godot Engine using pure GDScript — now capable of running on both **CPU and GPU**, depending on the platform and configuration chosen.
 
-While capable of supporting educational demonstrations, research experiments, and gameplay mechanics, its primary focus is to explore the dynamics of infectious disease spread as an interactive world — allowing users to watch, tweak, and understand how outbreaks evolve under varying conditions.
+While designed for educational demonstrations, research experiments, and adaptive gameplay mechanics, its primary focus is to explore the dynamics of infectious disease spread in an **interactive, responsive world**. Users can **observe, tweak, pause, accelerate, and modify parameters live**, experiencing the outbreak’s evolution under rapidly changing conditions.
 
 At its core, the simulation combines a hybrid modeling approach:
 
-- SEIR disease compartments for representing latent, infectious, and recovered stages,
-- spatial grid–based contact logic for localized transmission events, and
-- unified transmission probability mechanics that work consistently across frames.
+- **SEIR epidemiological model** for latent, infectious, and recovered stages,
+- **spatial grid–based contact logic** for localized transmission events, and
+- **unified probabilistic mechanics** ensuring consistent results across frames and hardware contexts.
 
-Transmission radius, incubation and infectious period timers, agent bounds, movement speed, and other parameters are fully configurable, making the simulation an adaptable sandbox for experimenting with epidemiological scenarios.
+All simulation parameters — including transmission radius, incubation/infectious timers, tick rate, movement speed, and sampling interval — can be **changed in real time** via a **dedicated runtime parameter screen**, allowing results and graphs to update immediately without restarting the scenario.  
+Users can directly observe how subtle changes (like shorter incubation or higher contact probability) alter population dynamics on‑screen with zero latency.
 
-Despite handling 20–30k independent agents with moderate transmission rates, the design achieves high performance entirely on the CPU — no shaders required — thanks to efficient data structures and careful event scheduling. Population states are tracked in real time, with dynamic graph updates at user‑controlled sampling intervals, providing immediate visual feedback on infection trends.
+Despite handling 20–30k independent agents, the framework achieves high performance through selective execution:
 
-Whether used by students for learning fundamentals, developers for prototyping mechanics, reviewers for code analysis, or researchers for high‑level modeling, this framework offers a clear, modifiable, and reproducible environment for simulating pandemics.
+- On **CPU:** efficient packed array operations, spatial grids, and branch‑minimized update cycles.
+- On **GPU:** parallelized agent rendering and grid sampling accelerate visual layers and transmissive feedback loops.
+
+The deterministic tick‑based system ensures **recordability and replayability**.  
+Every event — position updates, infections, recoveries, and even parameter changes made mid‑simulation — is stored in the timeline.  
+When re‑played, the engine reproduces both population behavior and configuration mutations exactly as they occurred, providing an accurate foundation for controlled experiments and repeatable analysis.
+
+Whether used by students, developers, reviewers, or researchers, this framework creates a transparent, modifiable environment for watching complex epidemic behavior emerge dynamically from first principles.
+
+---
 
 ## Features
 
-- **Hybrid Transmission Simulation Core** — Combines a spatial grid‑partitioning system with configurable transmission radius logic, updating agents in discrete ticks. Tick rate is fully dynamic and can be paused, sped up, or slowed down via a runtime speed factor, allowing precision control over simulation pacing.
+- **Dual‑Mode Execution (CPU + GPU)** — Simulations automatically adapt to available hardware. Agents can be rendered and processed efficiently on GPU for larger setups, or fallback to CPU for deterministic and analytical runs.
 
-- **SEIR Disease Model** — Implements the susceptible–exposed–infectious–recovered framework, with incubation and infectious timers tied directly to the tick system for deterministic progression.
+- **Hybrid Transmission Simulation Core** — Combines spatial grid‑partitioning with configurable transmission radius logic.  
+  Tick rate, simulation speed, and execution flow can be **paused, accelerated, or slowed down** in real time for precision control.
 
-- **Fully Adjustable Runtime Parameters** — Speed, tick rate, graph sampling interval, and every disease parameter can be changed in real time. Future commits will streamline in‑simulation parameter tweaking for seamless experimentation without restarting scenarios.
+- **SEIR Disease Model** — Implements the susceptible–exposed–infectious–recovered compartment framework with incubation and infectious timers firmly tied to the tick cycle for predictable progression.
 
-- **Real‑Time World Visualization** — Displays all agents, their positions, movement, and health states on an interactive map. Zoom and pan are supported for exploring outbreaks at local and global scales, with real‑time population counts per state and dynamic sampling for live graph updates.
+- **Dedicated Parameter Screen** — A real‑time control panel lists every adjustable parameter — tick rate, speed multiplier, infection probability, incubation duration, transmission radius, and more — with immediate feedback on changes.  
+  Adjustments are applied instantly to the running simulation and reflected in live graphs and visuals.
 
-- **Performance‑Optimized Execution** — Uses packed arrays, spatial grids, and minimal branching to handle 20–30k agents on CPU alone. Overhead from function calls, index lookups, and conditional checks is reduced to ensure smooth scaling.
+- **Dynamic Parameter Mutation Recording** — Parameter edits during a simulation session are recorded alongside agent states and events, allowing deterministic replay of both epidemic progression _and_ human interaction moments (e.g., speed changes, probability adjustments).
 
-- **Persistence System (In Progress)** — Deterministic tick‑based updates lay the groundwork for exact scenario replay. Upcoming features will include full save/load capabilities for sharing and re‑running identical outbreak timelines.
+- **Full Replay System** — All simulations are time‑stamped and stored for deterministic replay. The playback engine reproduces each tick and any mid‑simulation modifications, ensuring identical outcomes and supporting comparative scenario analysis.
 
-- **Debugging & Metrics Framework (In Progress)** — Consistent tick logic supports future granular logging, step‑through playback, and CSV metric export for offline analysis.
+- **Real‑Time Visualization** — Displays the complete population on an interactive map. Zoom and pan controls enable exploration from local hotspots to global overviews.  
+  Population counts per SEIR state are continually updated, and dynamic graphs visually respond to parameter changes with stable sampling logic.
 
-- **Scenario Configurations** — Any simulation can be saved as a configuration file and loaded for future runs, enabling reproducible tests and cross‑environment sharing.
+- **Performance‑Optimized Core** — Packed arrays, spatial grids, and minimal branch logic allow tens of thousands of agents to run smoothly on CPU, while GPU execution accelerates mesh rendering and spatial queries.  
+  Fixed timestep scheduling keeps simulations deterministic across frame rates and hardware variations.
+
+- **Persistence & Configuration System** — Simulations and scenarios can be saved, loaded, and shared as reproducible configuration files.  
+  Each configuration preserves environment bounds, disease parameters, runtime speed, and seed values for exact regeneration.
+
+- **Logging & Metrics Framework** — Granular event logging at tick resolution, coupled with optional CSV export, supports analytical and academic use. Logged runs can be later visualized or replayed inside Godot without loss of fidelity.
+
+---
 
 ## Architecture Overview
 
-The Pandemic Simulation Framework’s codebase is organized into modular execution, visualization, and resource layers, ensuring a clear separation between **epidemiological logic**, **agent representation**, and **support tooling**. This modularity makes the system scalable for tens of thousands of agents while remaining easy to debug and extend.
+The Pandemic Simulation Framework’s codebase is organized into modular execution, visualization, and resource layers, maintaining clear separation between **epidemiological logic**, **agent representation**, and **support tooling**.  
+This modularity ensures scalability for tens of thousands of agents and simplifies debugging, replay, and performance profiling.
 
 ### Core Components
 
-- **Scripts (`/scripts`)** — All logic and supporting utilities written entirely in GDScript.  
-  - **`agents/`** — Handles agent lifecycle and behavior.  
-    - `agent_manager.gd` — Registers and oversees all agents.  
-    - `agent_movement_manager.gd` — Computes per‑tick movement paths and applies motion policies.  
-    - `agent_state_manager.gd` — Manages SEIR state transitions and timers.  
-    - `agent_renderer.gd` — Renders agents efficiently using `MeshInstance2D` for large populations.  
-    - `contact_tracer.gd` — Performs spatial grid partitioning and agent bucketing to detect transmission events with minimal overhead.  
-    - `census.gd` — Tracks population state counts in real time.  
+- **Scripts (`/scripts`)** — All logic and supporting utilities written entirely in GDScript.
 
-  - **`plot/`** — Real‑time graphing and map overlays.  
-    - `metric_graph.gd` and `metric_graph_panel.gd` — Visualize numerical trends (infection curves, recovery rates, etc.).  
-    - `grid.gd` — Renders spatial grids for debugging or analytical visualization.
+  - **`agents/`** — Handles agent lifecycle and state behavior.
 
-  - **`resources/`** — Configurable simulation assets.  
-    - `simulation_config.gd` — Defines scenario parameters and environment bounds.  
-    - `infection_config.gd` — Stores disease‑specific parameters (transmission radius, incubation and infectious timers).  
+    - `agent_manager.gd` — Oversees creation, deletion, and master state tracking.
+    - `agent_movement_manager.gd` — Manages per‑tick movement based on bounds and speed parameters.
+    - `agent_state_manager.gd` — Executes SEIR transitions and incubation/infectious timers.
+    - `agent_renderer.gd` — Switches rendering backend between CPU and GPU modes for scalable performance.
+    - `contact_tracer.gd` — Executes spatial partitioning for transmission detection using grid‑based collision maps.
+    - `census.gd` — Tracks population counts and aggregation metrics live.
 
-  - **`simulation_ui/`** — In‑engine UI elements.  
-    - `tick_label.gd` and `zoom_label.gd` — Show current tick rate and zoom level dynamically.  
-    - Graph elements for displaying state distributions and census statistics.  
+  - **`plot/`** — Manages graph panels and overlays.
 
-  - **Top‑Level Utility Classes**  
-    - `zoom_pan.gd` — Implements smooth zooming and panning on target nodes.  
-    - `simulation_controller.gd` — Initializes and runs the simulation, wiring together all manager classes.  
-    - `fixed_step_timer.gd` — Provides consistent tick‑based updates with optional `get_alpha()` for smooth interpolation in visual layers.  
+    - `metric_graph_panel.gd` & `metric_graph.gd` visualize infection, recovery, and parameter mutation curves.
+    - `grid_layer.gd` provides debug visual layers for tracing spatial density.
 
-- **Assets (`/assets/configs`)** — Contains pre‑built scenario configurations for quick loading and reproduction.
+  - **`resources/`** — Defines scenario and infection configurations.
+
+    - `simulation_config.gd` — Holds scenario properties and bounds.
+    - `infection_config.gd` — Stores parameters for transmission radius, incubation/infectious duration, and active GPU/CPU toggle.
+
+  - **`simulation_ui/`** — Interactive in‑simulation interface.
+
+    - `parameter_panel.gd` — Dedicated screen to adjust and monitor parameters at runtime.
+    - `tick_label.gd` and `zoom_label.gd` — Reflect live tick rate and zoom ratio.
+    - Graphical census components provide immediate state breakdown visualization.
+
+  - **Top‑Level Utility Classes**
+    - `simulation_controller.gd` — Initializes, orchestrates, and connects all managers.
+    - `zoom_pan.gd` — Implements smooth navigation on the simulation map.
+    - `fixed_step_timer.gd` — Keeps deterministic ticks with optional `get_alpha()` for interpolated visuals.
+    - `recording_manager.gd` — Logs and replays every tick event, agent state, and parameter mutation.
+
+- **Assets (`/assets/configs`)** — Houses reproducible scenario configurations and recorded runs for testing and replay.
+
+---
 
 ### Simulation Flow
 
-1. **Initialization**  
-   - Loads all parameters from `simulation_config` and `infection_config`.  
-   - Instantiates managers (movement, state, rendering, contact tracing) and connects relevant update signals.  
-   - Renders initial agent positions and states.
+1. **Initialization**
 
-2. **Tick Generation**  
-   - Driven by `fixed_step_timer` for deterministic updates, optionally providing interpolation via `get_alpha()` for smoother visuals when required.
+   - Loads configuration files and applies preset parameters.
+   - Selects execution mode (CPU/GPU).
+   - Initializes managers and links signal callbacks.
 
-3. **Movement & Contact Processing**  
-   - `agent_movement_manager` updates positions per tick.  
-   - `contact_tracer` uses spatial grids and agent buckets to compute collisions within transmission radius with minimal CPU overhead.
+2. **Tick Generation**
 
-4. **State Transitions**  
-   - `agent_state_manager` checks infectious and incubation timers and switches agent states when timers expire.
+   - Driven by `fixed_step_timer` for deterministic updates.
+   - Visual layers interpolate smoothly using `get_alpha()` when needed.
 
-5. **Metrics & Visualization**  
-   - `census` updates population counts based on state change events.  
-   - Graph elements update at either fixed sampling intervals or real‑time event triggers, depending on configuration.  
-   - Map and overlays display agent states, positions, and movement paths.
+3. **Movement & Contact Processing**
 
-6. **Logging (Planned)**  
-   - The tick‑based deterministic design allows straightforward recording of all events and states for replay and offline analysis.
+   - `agent_movement_manager` updates positions based on runtime speed.
+   - `contact_tracer` identifies collisions via grid buckets to calculate transmission probabilities.
+
+4. **State Transitions**
+
+   - `agent_state_manager` advances incubation/infectious timers and state swaps using SEIR logic.
+
+5. **Parameter Adjustments**
+
+   - Any user modification on the **parameter screen** updates live in the simulation and is instantly recorded for replay.
+
+6. **Metrics & Visualization**
+
+   - `census` gathers population summaries.
+   - Graph panels dynamically render changes at configurable sampling intervals.
+
+7. **Recording & Replay**
+   - `recording_manager` stores all tick events and configuration mutations.
+   - Replays reproduce identical population behavior and user interaction patterns.
+
+---
 
 ## License
 
