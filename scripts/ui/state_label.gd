@@ -40,6 +40,6 @@ func _on_simulation_ended() -> void:
 ## Subscribes to live Census signals on simulation start.
 ## Why: Avoids null access before Census is initialized, ensuring safe reactive updates.
 func _on_simulation_started() -> void:
-	census = simulation_controller.agent_manager.state_manager.census
+	census = simulation_controller.simulation.agent_manager.state_manager.census
 	census.census_updated.connect(_on_census_updated)
 	_on_census_updated(state, census.get_census(state))

@@ -31,6 +31,8 @@ var census: Census
 
 # === Core update logic ===
 func _update_graph() -> void:
+	if not census:
+		return
 	## Get the current count of agents in the chosen state.
 	## Why cast to float: Graph API expects float values for drawing, even if discrete.
 	var amount: int = census.get_census(state)
@@ -52,13 +54,12 @@ func _ready() -> void:
 		max_points
 	)
 	add_child(graph_panel)  ## Attach panel so it appears in the scene immediately.
-
 	## Set timer until next sample — avoids double‑sampling right after init.
 	next_sample_in = sampling_rate
 
 # === Per-frame execution ===
 func _process(delta: float) -> void:
-	if simulation_controller.timer.paused:
+	if not simulation_controller.is_running():
 		return
 	_advance_interval(delta)
 
@@ -78,4 +79,4 @@ func _on_simulation_ended() -> void:
 
 func _on_simulation_started() -> void:
 	## Connect to live census data in the simulation.
-	census = simulation_controller.agent_manager.state_manager.census
+	census = simulation_controller.simulation.agent_manager.state_manager.census

@@ -191,3 +191,8 @@ func set_transmission_radius(radius: float) -> void:
 ## Updates probability used for transmission checks.
 func set_transmission_probability(probability: float) -> void:
 	transmission_probability = probability
+
+func update_config(cfg: SimulationConfig) -> void:
+	agent_count = cfg.agent_count
+	transmission_radius = cfg.infection_config.transmission_radius
+	transmission_probability = cfg.infection_config.transmission_probability

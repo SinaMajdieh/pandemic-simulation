@@ -1,12 +1,14 @@
-[gd_scene load_steps=12 format=3 uid="uid://dva3p76bui31w"]
+[gd_scene load_steps=14 format=3 uid="uid://dva3p76bui31w"]
 
 [ext_resource type="PackedScene" uid="uid://pumx6vjvgno2" path="res://scenes/simulation.tscn" id="1_axkpk"]
 [ext_resource type="Theme" uid="uid://cd86gbw8ppkb" path="res://assets/themes/one_dark.tres" id="1_wo8b0"]
-[ext_resource type="Script" uid="uid://bi45lkxsa6ojy" path="res://scripts/zoom_pan.gd" id="3_iaqyx"]
+[ext_resource type="Script" uid="uid://bi45lkxsa6ojy" path="res://scripts/simulation_ui/zoom_pan.gd" id="3_iaqyx"]
 [ext_resource type="Script" uid="uid://d2yj3o0hs2ar2" path="res://scripts/ui/zoom_label.gd" id="4_0qlcw"]
+[ext_resource type="Script" uid="uid://dny5q5r73lfbp" path="res://scripts/simulation/simulation_controller.gd" id="4_5821d"]
 [ext_resource type="Script" uid="uid://i5gbx180p78b" path="res://scripts/simulation/fixed_step_timer.gd" id="4_smusf"]
 [ext_resource type="Script" uid="uid://dpkgjsp6sx0cv" path="res://scripts/simulation_ui/graph.gd" id="5_bdi4y"]
 [ext_resource type="Script" uid="uid://bmmxhednxx6g" path="res://scripts/ui/state_label.gd" id="5_nxfk8"]
+[ext_resource type="Resource" uid="uid://cbnot6s7ufo4f" path="res://assets/configs/simulation_config.tres" id="6_5821d"]
 [ext_resource type="Script" uid="uid://bjepwkbs0evtc" path="res://scripts/ui/tick_label.gd" id="6_yidup"]
 [ext_resource type="Texture2D" uid="uid://bvmde6x7w4cah" path="res://assets/icons/info.svg" id="7_icfv3"]
 [ext_resource type="Texture2D" uid="uid://b2opn1tj2y3ge" path="res://assets/icons/settings.svg" id="7_vkt81"]
@@ -29,23 +31,30 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="ZoomPan" type="Node2D" parent="SimulationContainer" node_paths=PackedStringArray("target_node")]
-script = ExtResource("3_iaqyx")
-target_node = NodePath("../Simulation")
-min_zoom = 0.1
-max_zoom = 100.0
-limits_enabled = true
-
 [node name="FixedStepTimer" type="Node" parent="SimulationContainer"]
 script = ExtResource("4_smusf")
 step_seconds = 0.05
 metadata/_custom_type_script = "uid://i5gbx180p78b"
 
-[node name="Simulation" parent="SimulationContainer" node_paths=PackedStringArray("ui_container", "zoom_pan", "timer") instance=ExtResource("1_axkpk")]
-ui_container = NodePath("..")
-zoom_pan = NodePath("../ZoomPan")
-radius = 1.0
+[node name="ZoomPan" type="Node2D" parent="SimulationContainer" node_paths=PackedStringArray("target_node")]
+script = ExtResource("3_iaqyx")
+target_node = NodePath("../SimulationController/Simulation")
+min_zoom = 0.1
+max_zoom = 100.0
+limits_enabled = true
+
+[node name="SimulationController" type="Node2D" parent="SimulationContainer" node_paths=PackedStringArray("timer", "simulation")]
+script = ExtResource("4_5821d")
 timer = NodePath("../FixedStepTimer")
+simulation = NodePath("Simulation")
+metadata/_custom_type_script = "uid://dny5q5r73lfbp"
+
+[node name="Simulation" parent="SimulationContainer/SimulationController" node_paths=PackedStringArray("ui_container", "zoom_pan", "timer") instance=ExtResource("1_axkpk")]
+config = ExtResource("6_5821d")
+ui_container = NodePath("../..")
+zoom_pan = NodePath("../../ZoomPan")
+radius = 1.1
+timer = NodePath("../../FixedStepTimer")
 
 [node name="ZoomLabel" type="Label" parent="SimulationContainer" node_paths=PackedStringArray("zoom_pan")]
 layout_mode = 1
@@ -121,7 +130,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("5_bdi4y")
-simulation_controller = NodePath("../../../../SimulationContainer/Simulation")
+simulation_controller = NodePath("../../../../SimulationContainer/SimulationController")
 line_width = 0.5
 max_points = 60000
 sampling_rate = 0.001
@@ -132,7 +141,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("5_bdi4y")
 state = 1
-simulation_controller = NodePath("../../../../SimulationContainer/Simulation")
+simulation_controller = NodePath("../../../../SimulationContainer/SimulationController")
 line_width = 0.5
 max_points = 60000
 sampling_rate = 0.001
@@ -143,7 +152,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("5_bdi4y")
 state = 2
-simulation_controller = NodePath("../../../../SimulationContainer/Simulation")
+simulation_controller = NodePath("../../../../SimulationContainer/SimulationController")
 line_width = 0.5
 max_points = 60000
 sampling_rate = 0.001
@@ -154,7 +163,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("5_bdi4y")
 state = 3
-simulation_controller = NodePath("../../../../SimulationContainer/Simulation")
+simulation_controller = NodePath("../../../../SimulationContainer/SimulationController")
 line_width = 0.5
 max_points = 60000
 sampling_rate = 0.001
@@ -195,7 +204,7 @@ text = "0"
 horizontal_alignment = 2
 vertical_alignment = 1
 script = ExtResource("5_nxfk8")
-simulation_controller = NodePath("../../../../../../SimulationContainer/Simulation")
+simulation_controller = NodePath("../../../../../../SimulationContainer/SimulationController")
 
 [node name="Exposed" type="Label" parent="Stats/VBoxContainer/CenterContainer/VBoxContainer/GridContainer"]
 layout_mode = 2
@@ -213,7 +222,7 @@ horizontal_alignment = 2
 vertical_alignment = 1
 script = ExtResource("5_nxfk8")
 state = 1
-simulation_controller = NodePath("../../../../../../SimulationContainer/Simulation")
+simulation_controller = NodePath("../../../../../../SimulationContainer/SimulationController")
 
 [node name="Infectious" type="Label" parent="Stats/VBoxContainer/CenterContainer/VBoxContainer/GridContainer"]
 layout_mode = 2
@@ -231,7 +240,7 @@ horizontal_alignment = 2
 vertical_alignment = 1
 script = ExtResource("5_nxfk8")
 state = 2
-simulation_controller = NodePath("../../../../../../SimulationContainer/Simulation")
+simulation_controller = NodePath("../../../../../../SimulationContainer/SimulationController")
 
 [node name="Removed" type="Label" parent="Stats/VBoxContainer/CenterContainer/VBoxContainer/GridContainer"]
 layout_mode = 2
@@ -249,7 +258,8 @@ horizontal_alignment = 2
 vertical_alignment = 1
 script = ExtResource("5_nxfk8")
 state = 3
-simulation_controller = NodePath("../../../../../../SimulationContainer/Simulation")
+simulation_controller = NodePath("../../../../../../SimulationContainer/SimulationController")
 
-[connection signal="pressed" from="Stats/VBoxContainer/Buttons/Info" to="SimulationContainer/Simulation" method="_open_info_window"]
-[connection signal="pressed" from="Stats/VBoxContainer/Buttons/ConfigButton" to="SimulationContainer/Simulation" method="_open_config_window"]
+[connection signal="resized" from="SimulationContainer" to="SimulationContainer/SimulationController/Simulation" method="_on_simulation_container_resized"]
+[connection signal="pressed" from="Stats/VBoxContainer/Buttons/Info" to="SimulationContainer/SimulationController" method="_open_info_window"]
+[connection signal="pressed" from="Stats/VBoxContainer/Buttons/ConfigButton" to="SimulationContainer/SimulationController" method="_open_config_window"]

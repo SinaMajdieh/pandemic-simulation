@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://do8edojgtxrib" path="res://scripts/simulation_ui/simulation_config_window.gd" id="1_ijp0o"]
 
-[node name="Window" type="Window" node_paths=PackedStringArray("ui_container", "agent_count_spin", "agent_speed_spin", "bounds_width_spin", "bounds_height_spin", "transmission_radius_spin", "transmission_probability_spin", "transmission_grid_button", "exposed_timer_min", "exposed_timer_max", "infectious_timer_min", "infectious_timer_max", "initial_exposed_spin", "initial_infectious_spin", "pause_button", "speed_multiplier_spin", "tick_spin", "run_simulation_button", "stop_simulation_button", "contact_tracing_on_gpu_button", "disable_during_simulation")]
+[node name="Window" type="Window" node_paths=PackedStringArray("ui_container", "agent_count_spin", "agent_speed_spin", "bounds_width_spin", "bounds_height_spin", "transmission_radius_spin", "transmission_probability_spin", "transmission_grid_button", "exposed_timer_min", "exposed_timer_max", "infectious_timer_min", "infectious_timer_max", "initial_exposed_spin", "initial_infectious_spin", "pause_button", "speed_multiplier_spin", "tick_spin", "run_simulation_button", "stop_simulation_button", "replay_simulation_button", "contact_tracing_on_gpu_button", "disable_during_simulation", "simulation_parameters_ui")]
 oversampling_override = 1.0
 title = "Config"
 initial_position = 4
@@ -30,8 +30,10 @@ speed_multiplier_spin = NodePath("SimulationConfig/ConfigMargin/Layout/Panels/Si
 tick_spin = NodePath("SimulationConfig/ConfigMargin/Layout/Panels/SimulationVBox/SimulationPanel/SimulationMargin/SimulationVbox/Tick/TickSpin")
 run_simulation_button = NodePath("SimulationConfig/ConfigMargin/Layout/Buttons/Run")
 stop_simulation_button = NodePath("SimulationConfig/ConfigMargin/Layout/Buttons/Stop")
+replay_simulation_button = NodePath("SimulationConfig/ConfigMargin/Layout/Buttons/Replay")
 contact_tracing_on_gpu_button = NodePath("SimulationConfig/ConfigMargin/Layout/Panels/SimulationVBox/SimulationPanel/SimulationMargin/SimulationVbox/Pause/ContactTracingOnGPU")
 disable_during_simulation = [NodePath("SimulationConfig/ConfigMargin/Layout/Panels/SimulationConfigVBox/SimulationPanel/SimulationMargin/SimulationVbox/Population/AgentCountSpin"), NodePath("SimulationConfig/ConfigMargin/Layout/Panels/InitialStateVBox/InitialSttatesPanel/InitialStateMargin/StatesVbox/Exposed/InitialExposedSpin"), NodePath("SimulationConfig/ConfigMargin/Layout/Panels/InitialStateVBox/InitialSttatesPanel/InitialStateMargin/StatesVbox/Infectious/InitialInfectiousSpin"), NodePath("SimulationConfig/ConfigMargin/Layout/Panels/SimulationVBox/SimulationPanel/SimulationMargin/SimulationVbox/Pause/ContactTracingOnGPU")]
+simulation_parameters_ui = [NodePath("SimulationConfig/ConfigMargin/Layout/Panels/SimulationConfigVBox/SimulationPanel/SimulationMargin/SimulationVbox/Speed/AgentSpeedSpin"), NodePath("SimulationConfig/ConfigMargin/Layout/Panels/SimulationConfigVBox/SimulationPanel/SimulationMargin/SimulationVbox/Bounds/BoundsValue/BoundsWidthSpin"), NodePath("SimulationConfig/ConfigMargin/Layout/Panels/SimulationConfigVBox/SimulationPanel/SimulationMargin/SimulationVbox/Bounds/BoundsValue/BoundsHeightSpin"), NodePath("SimulationConfig/ConfigMargin/Layout/Panels/InfectiousConfigVBox/InfectiousPanel/InfectiousMargin/InfectiousVBox/TransmitionRadius/TransmitionRadiusSpin"), NodePath("SimulationConfig/ConfigMargin/Layout/Panels/InfectiousConfigVBox/InfectiousPanel/InfectiousMargin/InfectiousVBox/InfectiousProbability/TransmissionProbabilitySpin"), NodePath("SimulationConfig/ConfigMargin/Layout/Panels/TimerConfigVBox/TimersPanel/TimersMargin/TimersGridContainer/ExposedMinSpin"), NodePath("SimulationConfig/ConfigMargin/Layout/Panels/TimerConfigVBox/TimersPanel/TimersMargin/TimersGridContainer/ExposedMaxSpin"), NodePath("SimulationConfig/ConfigMargin/Layout/Panels/TimerConfigVBox/TimersPanel/TimersMargin/TimersGridContainer/InfectiousMinSpin"), NodePath("SimulationConfig/ConfigMargin/Layout/Panels/TimerConfigVBox/TimersPanel/TimersMargin/TimersGridContainer/InfectiousMaxSpin")]
 
 [node name="SimulationConfig" type="PanelContainer" parent="."]
 anchors_preset = 8
@@ -547,6 +549,13 @@ select_all_on_focus = true
 [node name="Buttons" type="HBoxContainer" parent="SimulationConfig/ConfigMargin/Layout"]
 layout_mode = 2
 size_flags_horizontal = 8
+
+[node name="Replay" type="Button" parent="SimulationConfig/ConfigMargin/Layout/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+theme_type_variation = &"button_default"
+text = "Replay"
 
 [node name="Stop" type="Button" parent="SimulationConfig/ConfigMargin/Layout/Buttons"]
 layout_mode = 2

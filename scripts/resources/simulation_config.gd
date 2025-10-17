@@ -8,6 +8,8 @@ class_name SimulationConfig
 
 @export_category("Simulation Setup")
 
+@export var seed_value: int = 329
+
 ## Whether to perform contact tracing computations on GPU instead of CPU.
 ## Why: Allows rapid switching between CPU and GPU paths for benchmarking and scalability testing.
 @export var contact_tracing_on_gpu: bool = true
@@ -69,6 +71,7 @@ func _to_string() -> String:
 ## Why: Used as intermediate form before writing or converting to JSON.
 func to_dictionary() -> Dictionary:
 	var results: Dictionary = {}
+	results["seed_value"] = seed_value
 	results["agent_count"] = agent_count
 	results["agent_speed"] = agent_speed
 	results["bounds"] = {"x": bounds.x, "y": bounds.y}
@@ -100,8 +103,10 @@ func to_dictionary() -> Dictionary:
 
 
 func from_dictionary(dictionary: Dictionary) -> void:
-		## Basic numeric + vector restoration.
+	## Basic numeric + vector restoration.
 	## Why: Reconstructs primary simulation setup values.
+	if dictionary.has("seed_value"):
+		seed_value = int(dictionary["seed_value"])
 	if dictionary.has("agent_count"):
 		agent_count = int(dictionary["agent_count"])
 	if dictionary.has("agent_speed"):

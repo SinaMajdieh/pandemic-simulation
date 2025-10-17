@@ -60,3 +60,9 @@ func bound_movement(agent_index: int) -> void:
 	if pos.y < 0.0 or pos.y > bounds.y:
 		directions[agent_index].y = -directions[agent_index].y
 		positions[agent_index].y = clamp(pos.y, 0.0, bounds.y)
+
+
+func update_config(cfg: SimulationConfig) -> void:
+	agent_count = cfg.agent_count
+	agent_speed = cfg.agent_speed
+	bounds = cfg.bounds

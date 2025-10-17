@@ -67,3 +67,9 @@ func set_transmission_probability(probability: float) -> void:
 ## Updates duration range per SEIR stage across the agent population.
 func set_state_timer(state: AgentStateManager.AgentState, state_timer: Vector2) -> void:
 	state_manager.set_state_timer(state, state_timer)
+
+func update_config(cfg: SimulationConfig) -> void:
+	agent_count = cfg.agent_count
+	state_manager.update_config(cfg)
+	movement_manager.update_config(cfg)
+	contact_tracer.update_config(cfg)

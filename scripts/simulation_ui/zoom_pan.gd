@@ -110,7 +110,7 @@ func _input(event: InputEvent) -> void:
 func is_mouse_inside_bounds(event: InputEvent) -> bool:
 	if event is InputEventMouse:
 		var local_mouse: Vector2 = to_local(event.position)
-		var rect: Rect2 = Rect2(Vector2.ZERO, bounds)
+		var rect: Rect2 = Rect2(Vector2.ZERO, size)
 		return rect.has_point(local_mouse)
 	return false
 

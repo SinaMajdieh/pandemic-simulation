@@ -127,3 +127,7 @@ func set_state_timer(state: AgentStateManager.AgentState, state_timer: Vector2) 
 	if not stage_durations.has(state):
 		return
 	stage_durations[state] = state_timer
+
+func update_config(cfg: SimulationConfig) -> void:
+	agent_count = cfg.agent_count
+	stage_durations = cfg.stage_durations

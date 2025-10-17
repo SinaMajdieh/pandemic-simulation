@@ -101,14 +101,17 @@ const SCENE: PackedScene = preload("res://scenes/simulation_config.tscn")
 ## Why: Graceful shutdown preserving all subsystem cleanup order.
 @export var stop_simulation_button: Button
 
+@export var replay_simulation_button: Button
+
 ## CheckBox controlling GPU contact tracing mode.
 ## Why: Enables runtime benchmarking of CPU vs. GPU infection pipeline.
 @export var contact_tracing_on_gpu_button: CheckButton
 
 ## Array of nodes disabled during active simulation.
 ## Why: Prevents unsafe real‑time configuration edits once systems start.
-@export var disable_during_simulation: Array[Node]
+@export var disable_during_simulation: Array[Control]
 
+@export var simulation_parameters_ui: Array[Control]
 
 ## Factory method generating pre‑connected configuration window instance.
 ## Why: Ensures dependency setup and initial parameter synchronization.
@@ -127,11 +130,14 @@ func _ready() -> void:
 	size = ui_container.size
 	simulation_controller.started.connect(_on_simulation_started)
 	simulation_controller.ended.connect(_on_simulation_stopped)
+	simulation_controller.replaying.connect(_on_simulation_replay)
 
 
 ## Synchronizes UI widget values with current configuration resource.
 ## Why: Guarantees correct reflection of real simulation parameters at open time.
 func update_from_config(cfg: SimulationConfig) -> void:
+	if not cfg:
+		return
 	agent_count_spin.value = cfg.agent_count
 	agent_speed_spin.value = cfg.agent_speed
 	bounds_width_spin.value = cfg.bounds.x
@@ -140,7 +146,7 @@ func update_from_config(cfg: SimulationConfig) -> void:
 
 	transmission_radius_spin.value = cfg.infection_config.transmission_radius
 	transmission_probability_spin.value = cfg.infection_config.transmission_probability * 100.0
-	transmission_grid_button.button_pressed = simulation_controller.cell_grid.visible
+	transmission_grid_button.button_pressed = simulation_controller.simulation.cell_grid.visible
 
 	exposed_timer_min.value = cfg.stage_durations[AgentStateManager.AgentState.EXPOSED].x
 	exposed_timer_max.value = cfg.stage_durations[AgentStateManager.AgentState.EXPOSED].y
@@ -178,6 +184,7 @@ func _connect_signals() -> void:
 	tick_spin.value_changed.connect(_on_tick_changed)
 	run_simulation_button.pressed.connect(_start_simulation)
 	stop_simulation_button.pressed.connect(simulation_controller.end)
+	replay_simulation_button.pressed.connect(simulation_controller.replay)
 
 
 ## Handles GPU tracing toggle change.
@@ -250,6 +257,7 @@ func _on_simulation_started() -> void:
 		else:
 			node.editable = false
 	run_simulation_button.hide()
+	replay_simulation_button.hide()
 	stop_simulation_button.show()
 
 
@@ -262,8 +270,26 @@ func _on_simulation_stopped() -> void:
 		else:
 			node.editable = true
 	run_simulation_button.show()
+	replay_simulation_button.show()
 	stop_simulation_button.hide()
+	unlock_simulation_parameters_ui()
 
+func _on_simulation_replay() -> void:
+	lock_simulation_parameters_ui()
+
+func lock_simulation_parameters_ui() -> void:
+	for node: Control in simulation_parameters_ui:
+		if node is Button:
+			node.disabled = true
+		else:
+			node.editable = false 
+
+func unlock_simulation_parameters_ui() -> void:
+	for node: Control in simulation_parameters_ui:
+		if node is Button:
+			node.disabled = false
+		else:
+			node.editable = true 
 
 ## Launches simulation with current configuration.
 ## Why: Acts as direct delegate to controller.start().

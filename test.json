@@ -1,0 +1,34 @@
+{
+	"agent_count": 1,
+	"agent_speed": 10.0,
+	"bounds": {
+		"x": 20.0,
+		"y": 20.0
+	},
+	"infection_config": {
+		"transmission_probability": 0.5,
+		"transmission_radius": 1.0
+	},
+	"initial_states": {
+		"1": 0,
+		"2": 0
+	},
+	"stage_durations": {
+		"0": {
+			"max": 0.0,
+			"min": 0.0
+		},
+		"1": {
+			"max": 10.0,
+			"min": 8.0
+		},
+		"2": {
+			"max": 14.0,
+			"min": 10.0
+		},
+		"3": {
+			"max": 0.0,
+			"min": 0.0
+		}
+	}
+}
